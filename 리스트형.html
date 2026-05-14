@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>친구들의 캐츠 활용기 프로토타입 — CATS-19027 (리스트형)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #FF6B35;
+      --primary-dark: #E55A25;
+      --primary-light: #FFF3EE;
+      --primary-border: #FFD5C2;
+      --secondary: #0056D2;
+      --notice-color: #0056D2;
+      --recommend-color: #FF6B35;
+      --green: #22C55E;
+      --text-dark: #1A1A2E;
+      --text-mid: #555;
+      --text-light: #888;
+      --text-muted: #bbb;
+      --border: #E5E7EB;
+      --bg: #F8F9FA;
+      --white: #FFFFFF;
+    }
+    body {
+      background: #d8dde5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+
+    /* ── Proto Navigation ── */
+    .proto-nav {
+      display: flex;
+      gap: 4px;
+      padding: 10px 16px;
+      background: #1e1e2e;
+      width: 100%;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .nav-label { color: #666; font-size: 11px; margin-right: 2px; }
+    .nav-sep { color: #444; margin: 0 8px; }
+    .nav-btn {
+      background: #2a2a3e; border: none; color: #aaa;
+      padding: 5px 13px; border-radius: 6px; cursor: pointer; font-size: 12px;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: #3a3a4e; color: #fff; }
+    .nav-btn.active { background: var(--primary); color: #fff; }
+
+    /* ── Device Frame ── */
+    .device-frame {
+      width: 1334px;
+      height: 800px;
+      background: var(--white);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 6px 40px rgba(0,0,0,.25);
+      margin: 16px auto;
+      border-radius: 8px;
+    }
+    .screen { display: none; width: 100%; height: 100%; flex-direction: column; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* ════════════════════════════════
+       SCREEN 1: BOARD MAIN (LIST)
+    ════════════════════════════════ */
+    .board-wrap { display: flex; flex-direction: column; height: 100%; background: var(--white); }
+
+    /* Board Header */
+    .board-hd {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF9055 100%);
+      padding: 16px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .board-hd-left { display: flex; align-items: center; gap: 10px; }
+    .board-hd-right { display: flex; align-items: center; gap: 10px; }
+    .back-circle-btn {
+      background: rgba(255,255,255,.22); border: none; color: white;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .close-circle-btn {
+      background: rgba(255,255,255,.22); border: none; color: white;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .close-circle-btn:hover { background: rgba(255,255,255,.38); }
+    .board-hd-title { color: white; font-size: 20px; font-weight: 700; }
+    .board-hd-sub { color: rgba(255,255,255,.88); font-size: 12px; margin-top: 2px; }
+    .tip-btn {
+      background: white; border: none; color: var(--primary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; gap: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      transition: transform .15s, box-shadow .15s;
+      flex-shrink: 0;
+    }
+    .tip-btn:hover { transform: scale(1.04); box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+
+    /* Info Bar */
+    .board-info {
+      background: var(--primary-light);
+      padding: 8px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; border-bottom: 1px solid var(--primary-border);
+    }
+    .board-info-text { color: #b84000; font-size: 12.5px; }
+    .board-info-text b { color: var(--primary); }
+    .board-count { color: var(--text-light); font-size: 12px; }
+
+    /* Action Bar */
+    .action-bar {
+      padding: 10px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; border-bottom: 2px solid var(--primary);
+    }
+    .action-btns { display: flex; gap: 8px; }
+    .btn-mypost {
+      background: white; border: 2px solid var(--primary); color: var(--primary);
+      padding: 6px 18px; border-radius: 18px; cursor: pointer;
+      font-size: 12.5px; font-weight: 700; transition: all .15s;
+    }
+    .btn-mypost:hover { background: var(--primary-light); }
+    .btn-write {
+      background: var(--primary); border: 2px solid var(--primary); color: white;
+      padding: 6px 18px; border-radius: 18px; cursor: pointer;
+      font-size: 12.5px; font-weight: 700; transition: background .15s;
+    }
+    .btn-write:hover { background: var(--primary-dark); }
+
+    /* Single-Column List */
+    .list-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .list-cols { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .list-col { display: flex; flex-direction: column; }
+
+    .col-header {
+      display: grid;
+      grid-template-columns: 36px 1fr 72px 72px 48px;
+      gap: 0;
+      padding: 6px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .col-header span {
+      font-size: 11px; font-weight: 600; color: var(--text-light);
+      text-align: center;
+    }
+    .col-header span:nth-child(2) { text-align: left; padding-left: 4px; }
+
+    .list-item {
+      display: grid;
+      grid-template-columns: 36px 1fr 72px 72px 48px;
+      gap: 0;
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      align-items: center;
+      transition: background .1s;
+      min-height: 46px;
+    }
+    .list-item:hover { background: #FFF8F5; }
+    .list-item.is-notice { background: #FFFBF0; }
+    .list-item.is-notice:hover { background: #FFF5DC; }
+
+    .item-char {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .c-sam   { background: #FFE5D0; }
+    .c-dudu  { background: #D4EDFF; }
+    .c-latte { background: #FFF0CC; }
+    .c-kamil { background: #D8F5E4; }
+    .c-puki  { background: #EDE0F8; }
+    .c-cat1  { background: #FFE0E8; }
+
+    .item-title-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; padding: 0 6px; }
+    .item-badges { display: flex; gap: 3px; align-items: center; }
+    .badge {
+      font-size: 9.5px; padding: 1px 5px; border-radius: 3px;
+      font-weight: 700; flex-shrink: 0; line-height: 1.5;
+    }
+    .badge-notice    { background: var(--notice-color); color: white; }
+    .badge-recommend { background: var(--recommend-color); color: white; }
+    .item-title {
+      font-size: 12.5px; color: var(--text-dark);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .item-author { font-size: 11px; color: var(--text-light); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-date   { font-size: 11px; color: var(--text-light); text-align: center; }
+    .item-views  { font-size: 11px; color: var(--text-light); text-align: center; }
+
+    /* Pagination */
+    .pagination {
+      padding: 9px; display: flex; justify-content: center; align-items: center;
+      gap: 3px; flex-shrink: 0; border-top: 1px solid var(--border);
+    }
+    .page-btn {
+      width: 28px; height: 28px; border: 1px solid var(--border);
+      background: white; border-radius: 4px; cursor: pointer;
+      font-size: 12px; display: flex; align-items: center; justify-content: center;
+      transition: all .1s;
+    }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .page-btn:hover:not(.active) { background: var(--primary-light); }
+
+    /* ════════════════════════════════
+       POPUP SYSTEM
+    ════════════════════════════════ */
+    .popup-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,.52);
+      display: none; align-items: center; justify-content: center; z-index: 200;
+    }
+    .popup-overlay.show { display: flex; }
+    .popup-box {
+      background: white; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0,0,0,.28);
+      display: flex; flex-direction: column; max-height: 88%;
+    }
+    .popup-hd {
+      background: linear-gradient(135deg, #FF6B35, #FF9055);
+      padding: 16px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .popup-hd-title { color: white; font-size: 16px; font-weight: 700; }
+    .popup-close-btn {
+      background: rgba(255,255,255,.22); border: none; color: white;
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* TIP Popup */
+    .tip-popup-box { width: 580px; }
+    .tip-popup-body { padding: 22px 24px; overflow-y: auto; }
+    .tip-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .tip-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .tip-section-ttl { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 7px; }
+    .tip-section p, .tip-section li { font-size: 13px; color: var(--text-mid); line-height: 1.75; }
+    .tip-section ul { padding-left: 18px; }
+
+    /* My Posts Popup */
+    .mypost-popup-box { width: 820px; }
+    .mypost-popup-body { overflow-y: auto; max-height: 480px; }
+    .mypost-list-hd {
+      display: grid; grid-template-columns: 36px 1fr 80px 110px 56px;
+      gap: 0; padding: 9px 20px; background: var(--bg);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .mypost-list-hd span { font-size: 11.5px; font-weight: 700; color: var(--text-light); }
+    .mypost-item {
+      display: grid; grid-template-columns: 36px 1fr 80px 110px 56px;
+      gap: 0; padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      align-items: center; cursor: pointer; transition: background .1s;
+    }
+    .mypost-item:hover { background: #FFF8F5; }
+    .mypost-title { font-size: 13px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
+    .mypost-date  { font-size: 12px; color: var(--text-light); }
+    .mypost-views { font-size: 12px; color: var(--text-light); text-align: center; }
+    .status-public  { font-size: 12px; font-weight: 700; color: var(--green); }
+    .status-private { font-size: 12px; color: var(--text-light); }
+    .mypost-empty { padding: 56px 24px; text-align: center; }
+    .mypost-empty-ico { font-size: 44px; margin-bottom: 14px; }
+    .mypost-empty-txt { color: var(--text-light); font-size: 14.5px; line-height: 1.8; }
+
+    /* Status tooltip */
+    .status-tooltip {
+      font-size: 10.5px; color: var(--text-light); margin-top: 2px; line-height: 1.5;
+      display: none; padding: 6px 0;
+    }
+    .mypost-item:hover .status-tooltip { display: block; }
+
+    /* ════════════════════════════════
+       SCREEN 2: POST DETAIL
+    ════════════════════════════════ */
+    .detail-wrap { display: flex; flex-direction: column; height: 100%; }
+    .detail-hd {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF9055 100%);
+      padding: 14px 36px; display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .detail-hd-title { color: white; font-size: 18px; font-weight: 700; }
+    .detail-content { flex: 1; overflow-y: auto; padding: 32px 180px; }
+    .detail-post-hd {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding-bottom: 20px; border-bottom: 2px solid var(--primary); margin-bottom: 24px;
+    }
+    .detail-char {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+    }
+    .detail-meta { flex: 1; }
+    .detail-badges { display: flex; gap: 6px; margin-bottom: 6px; }
+    .detail-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; line-height: 1.4; }
+    .detail-info { display: flex; gap: 18px; font-size: 12.5px; color: var(--text-light); }
+    .detail-body { font-size: 14.5px; color: var(--text-mid); line-height: 1.95; min-height: 200px; white-space: pre-line; }
+    .detail-footer {
+      padding: 14px 180px; border-top: 1px solid var(--border);
+      flex-shrink: 0; display: flex; justify-content: center;
+    }
+    .btn-back {
+      background: white; border: 2px solid var(--border); color: var(--text-mid);
+      padding: 9px 36px; border-radius: 22px; cursor: pointer;
+      font-size: 13.5px; font-weight: 600; transition: all .15s;
+    }
+    .btn-back:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ════════════════════════════════
+       SCREEN 3: WRITE POST
+    ════════════════════════════════ */
+    .write-wrap { display: flex; flex-direction: column; height: 100%; }
+    .write-hd {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF9055 100%);
+      padding: 14px 36px; display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .write-hd-title { color: white; font-size: 18px; font-weight: 700; }
+    .write-content { flex: 1; overflow-y: auto; padding: 24px 180px; }
+    .write-sec { margin-bottom: 18px; }
+    .write-lbl {
+      font-size: 13.5px; font-weight: 700; color: var(--text-dark);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 4px;
+    }
+    .required { color: var(--primary); }
+
+    /* Character selector */
+    .char-selector { display: flex; gap: 16px; flex-wrap: wrap; }
+    .char-opt { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .char-opt-circle {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; border: 3px solid transparent;
+      transition: all .15s;
+    }
+    .char-opt:hover .char-opt-circle { border-color: #FFBB99; }
+    .char-opt.selected .char-opt-circle { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,107,53,.18); }
+    .char-opt-name { font-size: 11px; color: var(--text-light); }
+    .char-opt.selected .char-opt-name { color: var(--primary); font-weight: 700; }
+
+    /* Form fields */
+    .write-input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 9px 13px; font-size: 13.5px; font-family: inherit;
+      outline: none; transition: border-color .15s; color: var(--text-dark);
+    }
+    .write-input:focus { border-color: var(--primary); }
+    .char-count-row { text-align: right; font-size: 11.5px; color: var(--text-light); margin-top: 3px; }
+    .write-textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 9px 13px; font-size: 13.5px; font-family: inherit;
+      resize: none; height: 110px; outline: none; transition: border-color .15s;
+      color: var(--text-dark);
+    }
+    .write-textarea:focus { border-color: var(--primary); }
+
+    /* Promise box */
+    .promise-box {
+      background: var(--primary-light); border: 1px solid var(--primary-border);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .promise-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+    .promise-box p { font-size: 12px; color: var(--text-mid); line-height: 1.8; }
+
+    /* Write footer */
+    .write-footer {
+      padding: 13px 180px; border-top: 1px solid var(--border);
+      flex-shrink: 0; display: flex; justify-content: center; gap: 12px;
+    }
+    .btn-cancel {
+      background: white; border: 2px solid var(--border); color: var(--text-mid);
+      padding: 9px 44px; border-radius: 22px; cursor: pointer;
+      font-size: 13.5px; font-weight: 600; transition: all .15s;
+    }
+    .btn-cancel:hover { border-color: var(--text-mid); }
+    .btn-submit {
+      background: var(--primary); border: 2px solid var(--primary); color: white;
+      padding: 9px 44px; border-radius: 22px; cursor: pointer;
+      font-size: 13.5px; font-weight: 700; transition: background .15s;
+    }
+    .btn-submit:hover { background: var(--primary-dark); }
+
+    /* ════════════════════════════════
+       SUCCESS POPUP
+    ════════════════════════════════ */
+    .success-popup-box { width: 420px; }
+    .success-body { padding: 36px 32px; text-align: center; }
+    .success-ico { font-size: 52px; margin-bottom: 14px; }
+    .success-ttl { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+    .success-txt { font-size: 14px; color: var(--text-mid); line-height: 1.75; }
+    .success-note { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-top: 8px; }
+    .success-btn {
+      background: var(--primary); border: none; color: white;
+      padding: 11px 0; border-radius: 22px; cursor: pointer;
+      font-size: 14.5px; font-weight: 700; margin-top: 22px; width: 100%;
+      transition: background .15s;
+    }
+    .success-btn:hover { background: var(--primary-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- Proto navigation bar -->
+  <nav class="proto-nav">
+    <span class="nav-label">화면:</span>
+    <button class="nav-btn active" onclick="showScreen('screen-main')">게시판 목록</button>
+    <button class="nav-btn" onclick="showScreen('screen-detail')">게시글 상세</button>
+    <button class="nav-btn" onclick="showScreen('screen-write')">글쓰기</button>
+    <span class="nav-sep">|</span>
+    <span class="nav-label">팝업:</span>
+    <button class="nav-btn" onclick="showScreen('screen-main'); setTimeout(()=>showPopup('popup-tip'),50)">당선 TIP</button>
+    <button class="nav-btn" onclick="showScreen('screen-main'); setTimeout(()=>showPopup('popup-mypost-list'),50)">내 글 보기 (있음)</button>
+    <button class="nav-btn" onclick="showScreen('screen-main'); setTimeout(()=>showPopup('popup-mypost-empty'),50)">내 글 보기 (없음)</button>
+    <button class="nav-btn" onclick="showScreen('screen-write'); setTimeout(()=>showPopup('popup-success'),50)">등록 완료</button>
+    <span class="nav-sep">|</span>
+    <button class="nav-btn" onclick="showScreen('screen-main'); setTimeout(()=>showPopup('popup-mypost-paging'),50)">내 글 (페이징)</button>
+    <button class="nav-btn" onclick="showScreen('screen-main-empty')">전체 (빈화면)</button>
+  </nav>
+
+  <div class="device-frame" id="deviceFrame">
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 1: BOARD MAIN (LIST)
+    ═══════════════════════════════════════════ -->
+    <div class="screen active" id="screen-main">
+      <div class="board-wrap">
+
+        <!-- Header -->
+        <div class="board-hd">
+          <div class="board-hd-left">
+            <div class="board-hd-title">친구들의 캐츠 활용기</div>
+          </div>
+          <div class="board-hd-right">
+            <button class="tip-btn" onclick="showPopup('popup-tip')">
+              🏆 BEST 캐츠 친구 당선 TIP
+            </button>
+            <button class="close-circle-btn" title="닫기">✕</button>
+          </div>
+        </div>
+
+        <!-- Info bar -->
+        <div class="board-info">
+          <span class="board-info-text">매달 추첨을 통해 공개된 글 중 100명에게 <b>냥 포인트</b>를 드려요! Best 캐츠 친구로 뽑혀 보세요!</span>
+          <span class="board-count">게시글 수 : 4,320개</span>
+        </div>
+
+        <!-- Action bar -->
+        <div class="action-bar">
+          <div class="action-btns">
+            <button class="btn-mypost" onclick="showPopup('popup-mypost-list')">📋 내 글 보기</button>
+            <button class="btn-write" onclick="showScreen('screen-write')">✏️ 글쓰기</button>
+          </div>
+        </div>
+
+        <!-- Single-Column List -->
+        <div class="list-wrap">
+          <div class="list-cols">
+
+            <!-- ── List ── -->
+            <div class="list-col">
+              <div class="col-header">
+                <span></span>
+                <span>제목</span>
+                <span>작성자</span>
+                <span>작성일</span>
+                <span>조회</span>
+              </div>
+              <div class="list-item is-notice" onclick="showScreen('screen-detail')">
+                <div class="item-char c-sam">😺</div>
+                <div class="item-title-cell">
+                  <div class="item-badges"><span class="badge badge-notice">공지</span></div>
+                  <div class="item-title">🏆 5월 Best 캐츠 친구를 소개합니다!</div>
+                </div>
+                <div class="item-author">캐츠잉글리시</div>
+                <div class="item-date">2026.05.10</div>
+                <div class="item-views">514</div>
+              </div>
+              <div class="list-item is-notice" onclick="showScreen('screen-detail')">
+                <div class="item-char c-dudu">🐶</div>
+                <div class="item-title-cell">
+                  <div class="item-badges"><span class="badge badge-recommend">추천</span></div>
+                  <div class="item-title">캐츠로 영어 성적 20점이나 올렸어요!!!</div>
+                </div>
+                <div class="item-author">이*은</div>
+                <div class="item-date">2026.05.09</div>
+                <div class="item-views">388</div>
+              </div>
+              <div class="list-item is-notice" onclick="showScreen('screen-detail')">
+                <div class="item-char c-puki">🦊</div>
+                <div class="item-title-cell">
+                  <div class="item-badges"><span class="badge badge-recommend">추천</span></div>
+                  <div class="item-title">선생님도 깜짝 놀라신 영어 받아쓰기 만점!</div>
+                </div>
+                <div class="item-author">윤*서</div>
+                <div class="item-date">2026.05.09</div>
+                <div class="item-views">276</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-latte">🐻</div>
+                <div class="item-title-cell">
+                  <div class="item-title">매일 캐츠 하루도 빠짐없이 100일 달성했어요!</div>
+                </div>
+                <div class="item-author">김*연</div>
+                <div class="item-date">2026.05.08</div>
+                <div class="item-views">299</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-kamil">🐸</div>
+                <div class="item-title-cell">
+                  <div class="item-title">3학년인데 5학년 챕터까지 왔어요 ㅎㅎ</div>
+                </div>
+                <div class="item-author">한*빈</div>
+                <div class="item-date">2026.05.08</div>
+                <div class="item-views">234</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-puki">🦊</div>
+                <div class="item-title-cell">
+                  <div class="item-title">이번에 처음으로 독해 점수가 90점 넘었어요!</div>
+                </div>
+                <div class="item-author">최*현</div>
+                <div class="item-date">2026.05.06</div>
+                <div class="item-views">154</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-cat1">🐱</div>
+                <div class="item-title-cell">
+                  <div class="item-title">캐츠 덕분에 영어 말하기 대회에서 상 받았어요</div>
+                </div>
+                <div class="item-author">정*아</div>
+                <div class="item-date">2026.05.05</div>
+                <div class="item-views">143</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-sam">😺</div>
+                <div class="item-title-cell">
+                  <div class="item-title">캐츠 스피킹 연습 30일 연속 성공!!</div>
+                </div>
+                <div class="item-author">임*영</div>
+                <div class="item-date">2026.05.04</div>
+                <div class="item-views">139</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-dudu">🐶</div>
+                <div class="item-title-cell">
+                  <div class="item-title">어머니랑 같이 캐츠 영어 공부 중이에요!</div>
+                </div>
+                <div class="item-author">박*준</div>
+                <div class="item-date">2026.05.07</div>
+                <div class="item-views">187</div>
+              </div>
+              <div class="list-item" onclick="showScreen('screen-detail')">
+                <div class="item-char c-kamil">🐸</div>
+                <div class="item-title-cell">
+                  <div class="item-title">캐츠 영어 학원보다 더 재밌어요~~ ♡</div>
+                </div>
+                <div class="item-author">오*진</div>
+                <div class="item-date">2026.05.07</div>
+                <div class="item-views">197</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button class="page-btn">«</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">»</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── POPUP: Best 당선 TIP ─── -->
+      <div class="popup-overlay" id="popup-tip" onclick="closeOnOverlay(event,'popup-tip')">
+        <div class="popup-box tip-popup-box">
+          <div class="popup-hd">
+            <div class="popup-hd-title">🏆 Best 캐츠 친구 당선 TIP</div>
+            <button class="popup-close-btn" onclick="hidePopup('popup-tip')">✕</button>
+          </div>
+          <div class="tip-popup-body">
+            <div class="tip-section">
+              <div class="tip-section-ttl">📝 이렇게 쓰면 당선 확률이 높아요!</div>
+              <ul>
+                <li>캐츠를 활용한 구체적인 경험을 적어주세요</li>
+                <li>성적 향상, 학습 습관 변화 등 실제 결과를 공유해주세요</li>
+                <li>친구들에게 도움이 될 진솔한 이야기를 작성해주세요</li>
+              </ul>
+            </div>
+            <div class="tip-section">
+              <div class="tip-section-ttl">⚠️ 이런 글은 함께 볼 수 없어요</div>
+              <ul>
+                <li>욕설, 비방, 친구를 놀리는 내용</li>
+                <li>게시판과 관련 없는 내용</li>
+                <li>개인정보(전화번호, 주소 등)가 포함된 글</li>
+              </ul>
+            </div>
+            <div class="tip-section">
+              <div class="tip-section-ttl">⏰ 검수 및 공개 일정</div>
+              <p>작성한 글은 매주 검토되며, 공개까지 최대 1주일이 소요될 수 있어요.</p>
+            </div>
+            <div class="tip-section">
+              <div class="tip-section-ttl">🎁 냥 포인트 지급 기준</div>
+              <p>매달 공개된 게시글 중 추첨으로 100명에게 냥 포인트를 드려요!</p>
+            </div>
+            <div class="tip-section">
+              <div class="tip-section-ttl">📱 부모님께 연락하는 방법</div>
+              <p>당선 시 등록된 부모님 연락처로 개별 연락드립니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── POPUP: 내 글 보기 (있음) ─── -->
+      <div class="popup-overlay" id="popup-mypost-list" onclick="closeOnOverlay(event,'popup-mypost-list')">
+        <div class="popup-box mypost-popup-box">
+          <div class="popup-hd">
+            <div class="popup-hd-title">📋 내 글 보기</div>
+            <button class="popup-close-btn" onclick="hidePopup('popup-mypost-list')">✕</button>
+          </div>
+          <div class="mypost-list-hd">
+            <span></span><span>제목</span><span>작성일</span><span>글 상태</span><span>조회수</span>
+          </div>
+          <div class="mypost-popup-body">
+            <div class="mypost-item" onclick="hidePopup('popup-mypost-list'); showScreen('screen-detail')">
+              <div class="item-char c-puki">🦊</div>
+              <div class="mypost-title">이번에 처음으로 독해 점수가 90점 넘었어요!</div>
+              <div class="mypost-date">2026.05.06</div>
+              <div class="status-public">함께 보는 글</div>
+              <div class="mypost-views">154</div>
+            </div>
+            <div class="mypost-item">
+              <div class="item-char c-latte">🐻</div>
+              <div class="mypost-title">캐츠로 영어 재미있게 하는 방법 공유해요</div>
+              <div class="mypost-date">2026.04.20</div>
+              <div>
+                <div class="status-private">나만 보는 글</div>
+                <div class="status-tooltip">캐츠에서 친구의 글을 아직 확인하는 중이거나,<br>확인했지만 함께 볼 수 없는 글이에요.</div>
+              </div>
+              <div class="mypost-views">—</div>
+            </div>
+            <div class="mypost-item" onclick="hidePopup('popup-mypost-list'); showScreen('screen-detail')">
+              <div class="item-char c-sam">😺</div>
+              <div class="mypost-title">캐츠 시작하고 처음으로 영어 자신감이 생겼어요!</div>
+              <div class="mypost-date">2026.03.15</div>
+              <div class="status-public">함께 보는 글</div>
+              <div class="mypost-views">89</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── POPUP: 내 글 보기 (없음) ─── -->
+      <div class="popup-overlay" id="popup-mypost-empty" onclick="closeOnOverlay(event,'popup-mypost-empty')">
+        <div class="popup-box mypost-popup-box" style="width:500px;">
+          <div class="popup-hd">
+            <div class="popup-hd-title">📋 내 글 보기</div>
+            <button class="popup-close-btn" onclick="hidePopup('popup-mypost-empty')">✕</button>
+          </div>
+          <div class="mypost-empty">
+            <div class="mypost-empty-ico">📝</div>
+            <div class="mypost-empty-txt">
+              친구가 작성한 글이 아직 없어요^^<br>
+              <span style="font-size:12.5px;color:#bbb;margin-top:6px;display:block">
+                [글쓰기] 버튼을 눌러 첫 번째 이야기를 남겨보세요!
+              </span>
+            </div>
+            <button class="btn-write" style="margin-top:20px;padding:9px 28px;border-radius:20px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px"
+              onclick="hidePopup('popup-mypost-empty'); showScreen('screen-write')">
+              ✏️ 글쓰기
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- ─── POPUP: 내 글 보기 (페이징) ─── -->
+      <div class="popup-overlay" id="popup-mypost-paging" onclick="closeOnOverlay(event,'popup-mypost-paging')">
+        <div class="popup-box mypost-popup-box">
+          <div class="popup-hd">
+            <div class="popup-hd-title">📋 내 글 보기</div>
+            <button class="popup-close-btn" onclick="hidePopup('popup-mypost-paging')">✕</button>
+          </div>
+          <div class="mypost-list-hd">
+            <span></span><span>제목</span><span>작성일</span><span>글 상태</span><span>조회수</span>
+          </div>
+          <div class="mypost-popup-body">
+            <div class="mypost-item" onclick="hidePopup('popup-mypost-paging'); showScreen('screen-detail')">
+              <div class="item-char c-puki">🦊</div>
+              <div class="mypost-title">이번에 처음으로 독해 점수가 90점 넘었어요!</div>
+              <div class="mypost-date">2026.05.06</div>
+              <div class="status-public">함께 보는 글</div>
+              <div class="mypost-views">154</div>
+            </div>
+            <div class="mypost-item">
+              <div class="item-char c-latte">🐻</div>
+              <div class="mypost-title">캐츠로 영어 재미있게 하는 방법 공유해요</div>
+              <div class="mypost-date">2026.04.20</div>
+              <div class="status-private">나만 보는 글</div>
+              <div class="mypost-views">—</div>
+            </div>
+            <div class="mypost-item" onclick="hidePopup('popup-mypost-paging'); showScreen('screen-detail')">
+              <div class="item-char c-sam">😺</div>
+              <div class="mypost-title">캐츠 시작하고 처음으로 영어 자신감이 생겼어요!</div>
+              <div class="mypost-date">2026.03.15</div>
+              <div class="status-public">함께 보는 글</div>
+              <div class="mypost-views">89</div>
+            </div>
+            <div class="mypost-item">
+              <div class="item-char c-dudu">🐶</div>
+              <div class="mypost-title">캐잉송 따라 부르다가 단어를 다 외웠어요! 너무 신기해요</div>
+              <div class="mypost-date">2026.03.01</div>
+              <div class="status-private">나만 보는 글</div>
+              <div class="mypost-views">—</div>
+            </div>
+            <div class="mypost-item">
+              <div class="item-char c-kamil">🐸</div>
+              <div class="mypost-title">영어 말하기 연습 30일 달성! 캐츠랑 같이 해서 더 재밌어요</div>
+              <div class="mypost-date">2026.02.18</div>
+              <div class="status-private">나만 보는 글</div>
+              <div class="mypost-views">—</div>
+            </div>
+            <div class="mypost-item">
+              <div class="item-char c-puki">🦊</div>
+              <div class="mypost-title">처음에는 어려웠는데 캐츠 3개월 하고 나니 훨씬 쉬워졌어요</div>
+              <div class="mypost-date">2026.02.05</div>
+              <div class="status-private">나만 보는 글</div>
+              <div class="mypost-views">—</div>
+            </div>
+          </div>
+          <!-- 팝업 내 페이지네이션 -->
+          <div style="display:flex;justify-content:center;align-items:center;gap:3px;padding:10px;border-top:1px solid var(--border);">
+            <button class="page-btn">«</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">»</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SCREEN: 전체보기 빈 화면 ─── -->
+    <div class="screen" id="screen-main-empty">
+      <div class="board-wrap">
+
+        <!-- Header -->
+        <div class="board-hd">
+          <div class="board-hd-left">
+            <div class="board-hd-title">친구들의 캐츠 활용기</div>
+          </div>
+          <div class="board-hd-right">
+            <button class="tip-btn" onclick="showPopup('popup-tip-empty')">
+              🏆 BEST 캐츠 친구 당선 TIP
+            </button>
+            <button class="close-circle-btn" title="닫기">✕</button>
+          </div>
+        </div>
+
+        <!-- Info bar -->
+        <div class="board-info">
+          <span class="board-info-text">매달 추첨을 통해 공개된 글 중 100명에게 <b>냥 포인트</b>를 드려요! Best 캐츠 친구로 뽑혀 보세요!</span>
+          <span class="board-count">게시글 수 : 0개</span>
+        </div>
+
+        <!-- Action bar -->
+        <div class="action-bar">
+          <div class="action-btns">
+            <button class="btn-mypost" onclick="showScreen('screen-main')">📋 내 글 보기</button>
+            <button class="btn-write" onclick="showScreen('screen-write')">✏️ 글쓰기</button>
+          </div>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--white);">
+          <div style="font-size:56px;opacity:.45;">📋</div>
+          <p style="font-size:17px;font-weight:700;color:#555;">아직 게시된 글이 없습니다</p>
+          <p style="font-size:13px;color:#999;text-align:center;line-height:1.7;">
+            첫 번째 활용기를 올려보세요!<br>매달 추첨을 통해 냥 포인트를 드려요.
+          </p>
+          <button class="btn-write" style="margin-top:4px;padding:9px 28px;border-radius:20px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px"
+            onclick="showScreen('screen-write')">
+            ✏️ 첫 글 쓰러 가기
+          </button>
+        </div>
+
+        <!-- Pagination (비활성) -->
+        <div class="pagination">
+          <button class="page-btn" disabled style="opacity:.35;">«</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn" disabled style="opacity:.35;">»</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 2: POST DETAIL
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-detail">
+      <div class="detail-wrap">
+        <div class="detail-hd">
+          <button class="back-circle-btn" onclick="showScreen('screen-main')">←</button>
+          <div class="detail-hd-title">친구들의 캐츠 활용기</div>
+        </div>
+        <div class="detail-content">
+          <div class="detail-post-hd">
+            <div class="detail-char c-puki">🦊</div>
+            <div class="detail-meta">
+              <div class="detail-badges">
+                <!-- 일반 게시글 — 뱃지 없음 -->
+              </div>
+              <div class="detail-title">이번에 처음으로 독해 점수가 90점 넘었어요!</div>
+              <div class="detail-info">
+                <span>작성자: 최*현</span>
+                <span>작성일: 2026.05.06</span>
+                <span>조회수: 154</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-body">안녕하세요! 저는 캐츠잉글리시 4학년 사용자예요 😊
+
+처음에는 영어가 너무 어렵고 재미없었는데, 캐츠를 시작한 지 6개월이 됐어요.
+
+특히 리딩 파트를 매일 꾸준히 했더니, 이번 학교 시험에서 독해 점수가 90점을 넘었어요! 선생님도 많이 칭찬해 주셨고, 엄마도 너무 기뻐하셨어요 🎉
+
+캐츠의 단계별 학습이 정말 도움이 많이 됐어요. 캐릭터들이 친근하게 설명해줘서 지루하지 않게 할 수 있었어요.
+
+앞으로도 꾸준히 해서 더 높은 점수를 받을 거예요! 캐츠 최고! 🐱</div>
+        </div>
+        <div class="detail-footer">
+          <button class="btn-back" onclick="showScreen('screen-main')">← 목록으로</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 3: WRITE POST
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-write">
+      <div class="write-wrap">
+        <div class="write-hd">
+          <button class="back-circle-btn" onclick="showScreen('screen-main')">←</button>
+          <div class="write-hd-title">글쓰기</div>
+        </div>
+        <div class="write-content">
+
+          <!-- 캐릭터 선택 -->
+          <div class="write-sec">
+            <div class="write-lbl">캐릭터 선택 <span class="required">*</span></div>
+            <div class="char-selector">
+              <div class="char-opt selected" onclick="selectChar(this)">
+                <div class="char-opt-circle c-sam">😺</div>
+                <span class="char-opt-name">샘</span>
+              </div>
+              <div class="char-opt" onclick="selectChar(this)">
+                <div class="char-opt-circle c-dudu">🐶</div>
+                <span class="char-opt-name">두두</span>
+              </div>
+              <div class="char-opt" onclick="selectChar(this)">
+                <div class="char-opt-circle c-latte">🐻</div>
+                <span class="char-opt-name">라떼</span>
+              </div>
+              <div class="char-opt" onclick="selectChar(this)">
+                <div class="char-opt-circle c-kamil">🐸</div>
+                <span class="char-opt-name">카밀</span>
+              </div>
+              <div class="char-opt" onclick="selectChar(this)">
+                <div class="char-opt-circle c-puki">🦊</div>
+                <span class="char-opt-name">프키</span>
+              </div>
+              <div class="char-opt" onclick="selectChar(this)">
+                <div class="char-opt-circle c-cat1">🐱</div>
+                <span class="char-opt-name">캣-1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 제목 입력 -->
+          <div class="write-sec">
+            <div class="write-lbl">제목 <span class="required">*</span></div>
+            <input type="text" class="write-input" id="title-input"
+              placeholder="제목을 입력해주세요 (최대 40자)" maxlength="40"
+              oninput="updateCount(this,'title-cnt',40)">
+            <div class="char-count-row"><span id="title-cnt">0</span>/40</div>
+          </div>
+
+          <!-- 본문 작성 -->
+          <div class="write-sec">
+            <div class="write-lbl">내용 <span class="required">*</span></div>
+            <textarea class="write-textarea" id="body-input"
+              placeholder="나의 캐츠 이야기를 자유롭게 작성해주세요!&#13;&#10;(캐츠를 활용한 경험, 성적 향상, 학습 습관 등 무엇이든 좋아요 ♡)"
+              maxlength="2000" oninput="updateCount(this,'body-cnt',2000)"></textarea>
+            <div class="char-count-row"><span id="body-cnt">0</span>/2000</div>
+          </div>
+
+          <!-- 이용 약속 -->
+          <div class="write-sec">
+            <div class="promise-box">
+              <div class="promise-title">📢 캐츠 친구들이 꼭 지켜야 할 약속</div>
+              <p>여기는 모두가 기분 좋게 글을 쓰는 공간이에요.<br>
+              욕설, 나쁜 말, 친구를 놀리는 말은 절대 쓰면 안 돼요!<br>
+              우리 함께 멋진 게시판을 만들어 봐요 ♡<br>
+              ※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="write-footer">
+          <button class="btn-cancel" onclick="showScreen('screen-main')">취소</button>
+          <button class="btn-submit" onclick="showPopup('popup-success')">등록하기</button>
+        </div>
+      </div>
+
+      <!-- ─── POPUP: 등록 완료 ─── -->
+      <div class="popup-overlay" id="popup-success" onclick="closeOnOverlay(event,'popup-success')">
+        <div class="popup-box success-popup-box">
+          <div class="success-body">
+            <div class="success-ico">🎉</div>
+            <div class="success-ttl">친구의 이야기를 들려줘서 고마워요 ♡</div>
+            <div class="success-txt">작성해준 글은 1주일 내에 등록될 예정이에요!</div>
+            <div class="success-note">※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은<br>다른 친구들과 함께 볼 수 없어요.</div>
+            <button class="success-btn" onclick="hidePopup('popup-success'); showScreen('screen-main')">
+              네 알겠습니다.
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /device-frame -->
+
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        const oc = b.getAttribute('onclick') || '';
+        b.classList.toggle('active', oc === `showScreen('${id}')`);
+      });
+    }
+    function showPopup(id)  { const el=document.getElementById(id); if(el) el.classList.add('show'); }
+    function hidePopup(id)  { const el=document.getElementById(id); if(el) el.classList.remove('show'); }
+    function closeOnOverlay(e, id) { if (e.target===e.currentTarget) hidePopup(id); }
+    function selectChar(opt) {
+      opt.closest('.char-selector').querySelectorAll('.char-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+    }
+    function updateCount(el, cntId, max) {
+      document.getElementById(cntId).textContent = el.value.length;
+    }
+  </script>
+</body>
+</html>

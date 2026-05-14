@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>친구들의 캐츠 활용기 — CATS-19027</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1A1A2E;display:flex;flex-direction:column;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','맑은 고딕',sans-serif}
+.proto-nav{display:flex;gap:4px;padding:10px 16px;background:#0F0F1E;width:100%;flex-wrap:wrap;align-items:center}
+.pnl{color:#555;font-size:11px;margin-right:6px;margin-left:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.nav-btn{background:#2A2A3E;border:1px solid #3A3A52;color:#9CA3AF;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px;transition:all .2s}
+.nav-btn:hover{background:#3A3A52;color:#fff}
+.nav-btn.active{background:#FF6B35;border-color:#FF6B35;color:#fff}
+.device-frame{width:1334px;height:800px;background:#fff;overflow:hidden;position:relative;box-shadow:0 8px 48px rgba(0,0,0,.5);margin:16px auto;border-radius:8px}
+.screen{display:none;width:100%;height:100%;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+
+/* Board Layout */
+.board-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F5F3F0}
+.board-header{background:#fff;padding:16px 32px 0;border-bottom:1px solid #E5E7EB;flex-shrink:0}
+.board-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.board-title{font-size:21px;font-weight:800;color:#1A1A2E;display:flex;align-items:center;gap:10px}
+.title-icon{width:36px;height:36px;background:linear-gradient(135deg,#FF6B35,#FF8C42);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.post-count{font-size:13px;color:#9CA3AF;font-weight:400;margin-left:4px}
+.post-count strong{color:#FF6B35;font-weight:700}
+.btn-tip{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1.5px solid #F59E0B;border-radius:24px;padding:8px 18px;cursor:pointer;font-size:13px;font-weight:700;color:#B45309;transition:all .2s}
+.btn-tip:hover{background:linear-gradient(135deg,#FFF3CD,#FFE082)}
+
+/* Tabs */
+.board-tabs{display:flex;align-items:center}
+.tab-btn{padding:10px 20px;font-size:14px;font-weight:600;color:#9CA3AF;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+.tab-btn.active{color:#FF6B35;border-bottom-color:#FF6B35}
+.tab-c{display:inline-block;background:#F3F4F6;color:#9CA3AF;font-size:11px;padding:1px 7px;border-radius:10px;margin-left:4px;font-weight:700}
+.tab-btn.active .tab-c{background:#FFEDD5;color:#FF6B35}
+.tab-sp{flex:1}
+.btn-write{display:flex;align-items:center;gap:6px;background:#FF6B35;border:none;color:#fff;padding:8px 22px;border-radius:24px;cursor:pointer;font-size:14px;font-weight:700;margin-bottom:4px;transition:all .2s}
+.btn-write:hover{background:#E85C28}
+
+/* Board Content */
+.board-content{flex:1;overflow:hidden;padding:12px 28px 0;display:flex;flex-direction:column;gap:10px}
+
+/* Notice Cards */
+.notice-zone{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0}
+.notice-card{background:linear-gradient(135deg,#FFFBF0,#FFF8E1);border:1.5px solid #F59E0B;border-left:5px solid #FF6B35;border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.notice-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(255,107,53,.15)}
+.notice-badge{display:inline-flex;align-items:center;gap:4px;background:#FF6B35;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:6px}
+.notice-title{font-size:14px;font-weight:700;color:#1A1A2E;margin-bottom:4px;line-height:1.4}
+.notice-meta{font-size:12px;color:#9CA3AF;display:flex;gap:10px}
+
+/* Post List */
+.post-list{background:#fff;border-radius:12px;border:1px solid #E5E7EB;overflow:hidden;flex:1;display:flex;flex-direction:column}
+.pl-header{display:grid;grid-template-columns:40px 1fr 96px 88px 64px;padding:8px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;font-size:11px;font-weight:700;color:#9CA3AF;gap:8px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
+.post-row{flex:1;display:grid;grid-template-columns:40px 1fr 96px 88px 64px;padding:0 18px;border-bottom:1px solid #F3F4F6;align-items:center;cursor:pointer;transition:background .15s;gap:8px;min-height:0}
+.post-row:last-child{border-bottom:none}
+.post-row:hover{background:#FFF8F5}
+.char-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.c-sam{background:#4A90D9}.c-dudu{background:#E74C3C}.c-latte{background:#F39C12}
+.c-kamil{background:#9B59B6}.c-prki{background:#2ECC71}.c-cat1{background:#FF6B35}
+.post-title-wrap{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;white-space:nowrap}
+.t-notice{background:#FEF3C7;color:#D97706}.t-rec{background:#EDE9FE;color:#7C3AED}
+.post-title{font-size:14px;color:#1A1A2E;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.post-auth{font-size:13px;color:#6B7280}
+.post-date{font-size:13px;color:#9CA3AF}
+.post-views{font-size:13px;color:#9CA3AF;text-align:right}
+
+/* Pagination — board-wrap 하단 고정 */
+.pagination{flex-shrink:0;display:flex;justify-content:center;align-items:center;gap:4px;padding:10px 0;background:#fff;border-top:1px solid #E5E7EB}
+.pg-btn{width:32px;height:32px;border:1px solid #E5E7EB;background:#fff;border-radius:8px;cursor:pointer;font-size:13px;color:#6B7280;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pg-btn:hover{border-color:#FF6B35;color:#FF6B35}
+.pg-btn.active{background:#FF6B35;border-color:#FF6B35;color:#fff;font-weight:700}
+
+/* My Posts */
+.my-row{display:grid;grid-template-columns:44px 72px 1fr 96px 96px 150px;padding:11px 18px;border-bottom:1px solid #F3F4F6;align-items:center;cursor:pointer;transition:background .15s;gap:8px}
+.my-row:last-child{border-bottom:none}
+.my-row:hover{background:#FFF8F5}
+.st-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700}
+.st-pub{background:#D1FAE5;color:#059669}
+.st-prv{background:#FEF3C7;color:#D97706}
+
+/* Empty State */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.empty-icon{font-size:60px;opacity:.5}
+.empty-text{font-size:16px;color:#6B7280;font-weight:600}
+.empty-sub{font-size:13px;color:#9CA3AF;text-align:center;line-height:1.6}
+.btn-write-lg{background:#FF6B35;color:#fff;border:none;padding:11px 30px;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+
+/* Detail */
+.detail-wrap{flex:1;overflow-y:auto;padding:24px 32px;display:flex;justify-content:center}
+.detail-inner{max-width:820px;width:100%}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:#9CA3AF;font-size:14px;cursor:pointer;margin-bottom:18px;transition:color .2s}
+.back-link:hover{color:#FF6B35}
+.detail-card{background:#fff;border-radius:16px;border:1px solid #E5E7EB;overflow:hidden}
+.detail-head{padding:24px 28px;border-bottom:1px solid #F3F4F6}
+.detail-tags{margin-bottom:10px}
+.detail-title{font-size:20px;font-weight:800;color:#1A1A2E;margin-bottom:14px;line-height:1.4}
+.detail-meta{display:flex;align-items:center;gap:14px}
+.detail-av-wrap{display:flex;align-items:center;gap:10px}
+.detail-author{font-size:14px;font-weight:700;color:#1A1A2E}
+.detail-sub{font-size:13px;color:#9CA3AF}
+.detail-body{padding:24px 28px;font-size:15px;color:#374151;line-height:1.9;min-height:180px}
+.detail-foot{padding:14px 28px;border-top:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center}
+.detail-views{font-size:13px;color:#9CA3AF}
+
+/* Write */
+.write-wrap{flex:1;overflow-y:auto;background:#F5F3F0}
+.write-inner{max-width:780px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+.write-head{display:flex;align-items:center;gap:12px}
+.back-btn{width:36px;height:36px;background:#fff;border:1px solid #E5E7EB;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#6B7280}
+.write-heading{font-size:20px;font-weight:800;color:#1A1A2E}
+.write-sec{background:#fff;border-radius:14px;border:1px solid #E5E7EB;padding:18px 22px}
+.write-sec-title{font-size:12px;font-weight:700;color:#FF6B35;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.char-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.char-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px 4px;border-radius:12px;border:2px solid transparent;transition:all .2s}
+.char-item:hover{background:#F9FAFB}
+.char-item.sel{border-color:#FF6B35;background:#FFF8F5}
+.char-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff}
+.char-name{font-size:12px;font-weight:600;color:#6B7280}
+.w-input{width:100%;border:1.5px solid #E5E7EB;border-radius:10px;padding:11px 14px;font-size:15px;color:#1A1A2E;outline:none;transition:border-color .2s;font-family:inherit}
+.w-input:focus{border-color:#FF6B35}
+textarea.w-input{resize:none;height:110px;line-height:1.7}
+.w-count{text-align:right;font-size:12px;color:#9CA3AF;margin-top:5px}
+.promise-box{background:#FFF8F0;border:1px solid #FFE0B2;border-radius:10px;padding:14px 18px;font-size:13px;color:#78350F;line-height:1.7}
+.promise-title{font-weight:700;color:#D97706;margin-bottom:8px}
+.btn-submit{background:linear-gradient(90deg,#FF6B35,#FF8C42);border:none;color:#fff;padding:16px;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;width:100%}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+
+/* Admin */
+.admin-layout{display:flex;height:100%}
+.admin-sb{width:216px;background:#1E293B;display:flex;flex-direction:column;flex-shrink:0}
+.admin-logo{padding:18px 20px;font-size:16px;font-weight:800;color:#fff;border-bottom:1px solid #334155}
+.admin-logo span{color:#FF6B35}
+.admin-grp{padding:12px 12px 4px;font-size:10px;font-weight:700;color:#64748B;letter-spacing:.5px;text-transform:uppercase}
+.admin-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#94A3B8;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.admin-item:hover{background:#334155;color:#E2E8F0}
+.admin-item.active{background:#1E3A5F;color:#FF6B35;border-left-color:#FF6B35;font-weight:700}
+.admin-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F8FAFC}
+.admin-bar{background:#fff;border-bottom:1px solid #E2E8F0;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.admin-pg-title{font-size:17px;font-weight:700;color:#1E293B}
+.admin-acts{display:flex;gap:8px}
+.a-btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid}
+.a-btn-p{background:#FF6B35;border-color:#FF6B35;color:#fff}
+.a-btn-s{background:#fff;border-color:#E2E8F0;color:#64748B}
+.admin-body{flex:1;overflow-y:auto;padding:18px 24px}
+.filter-bar{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;display:flex;gap:10px;margin-bottom:14px;align-items:center}
+.a-sel{border:1px solid #E2E8F0;border-radius:8px;padding:7px 12px;font-size:13px;color:#374151;background:#F9FAFB}
+.a-search{flex:1;border:1px solid #E2E8F0;border-radius:8px;padding:7px 12px;font-size:13px;color:#374151;outline:none}
+.tbl-wrap{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
+.a-tbl{width:100%;border-collapse:collapse}
+.a-tbl th{background:#F8FAFC;padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;border-bottom:1px solid #E2E8F0;text-transform:uppercase;letter-spacing:.3px}
+.a-tbl td{padding:10px 12px;font-size:13px;color:#374151;border-bottom:1px solid #F1F5F9}
+.a-tbl tr:last-child td{border-bottom:none}
+.a-tbl tr:hover td{background:#F8FAFC}
+.toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.tw{width:38px;height:21px;border-radius:11px;position:relative;transition:background .2s;flex-shrink:0}
+.tw.on{background:#22C55E}.tw.off{background:#D1D5DB}
+.td{position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tw.on .td{left:19px}.tw.off .td{left:2px}
+.a-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700}
+.at-n{background:#FEF3C7;color:#D97706}.at-r{background:#EDE9FE;color:#7C3AED}.at-g{background:#F1F5F9;color:#64748B}
+
+/* Modal */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay.active{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:28px;width:440px;position:relative;max-height:82%;overflow-y:auto}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:#F3F4F6;border:none;border-radius:50%;cursor:pointer;font-size:14px;color:#6B7280;display:flex;align-items:center;justify-content:center}
+.modal-title{font-size:18px;font-weight:800;color:#1A1A2E;margin-bottom:14px;padding-right:36px}
+.tip-sec{margin-bottom:12px;padding:12px 14px;background:#F9FAFB;border-radius:10px}
+.tip-sec-t{font-size:12px;font-weight:700;color:#FF6B35;margin-bottom:6px}
+.tip-sec p{font-size:13px;color:#374151;line-height:1.7}
+.modal-ok-icon{font-size:52px;text-align:center;margin-bottom:12px}
+.modal-ok-title{font-size:18px;font-weight:800;color:#1A1A2E;text-align:center;margin-bottom:10px}
+.modal-ok-text{font-size:14px;color:#6B7280;text-align:center;line-height:1.7;margin-bottom:20px}
+.modal-ok-btn{width:100%;background:#FF6B35;border:none;color:#fff;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<nav class="proto-nav">
+  <span class="pnl">화면</span>
+  <button class="nav-btn active" data-sc="board-list" onclick="showScreen('board-list')">게시판 목록</button>
+  <button class="nav-btn" data-sc="my-posts" onclick="showScreen('my-posts')">내 글 보기</button>
+  <button class="nav-btn" data-sc="my-posts-empty" onclick="showScreen('my-posts-empty')">내 글 없음</button>
+  <button class="nav-btn" data-sc="post-detail" onclick="showScreen('post-detail')">게시글 상세</button>
+  <button class="nav-btn" data-sc="write-post" onclick="showScreen('write-post')">글쓰기</button>
+  <button class="nav-btn" data-sc="admin" onclick="showScreen('admin')">CAS 어드민</button>
+  <span class="pnl">팝업</span>
+  <button class="nav-btn" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">Best TIP 팝업</button>
+  <button class="nav-btn" onclick="showScreen('write-post');setTimeout(()=>openModal('submit-modal'),80)">등록완료 팝업</button>
+  <span class="pnl">추가</span>
+  <button class="nav-btn" data-sc="my-posts-paging" onclick="showScreen('my-posts-paging')">내 글 (페이징)</button>
+  <button class="nav-btn" data-sc="board-list-empty" onclick="showScreen('board-list-empty')">전체 (빈화면)</button>
+</nav>
+
+<div class="device-frame">
+
+<!-- ===================== SCREEN 1: 게시판 목록 ===================== -->
+<div class="screen active" id="board-list">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title">
+          <div class="title-icon">📖</div>
+          친구들의 캐츠 활용기
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn-tip" onclick="openModal('tip-modal')">🏆 Best 캐츠 친구 당선 TIP</button>
+          <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
+        </div>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn active">전체 글 <span class="tab-c">4,320</span></div>
+        <div class="tab-btn" onclick="showScreen('my-posts')">내 글 보기 <span class="tab-c">3</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+
+    <div class="board-content">
+      <!-- 공지 섹션 -->
+      <div class="notice-zone">
+        <div class="notice-card" onclick="showScreen('post-detail')">
+          <div class="notice-badge">📌 공지</div>
+          <div class="notice-title">🏆 5월의 Best 캐츠 친구를 소개합니다!</div>
+          <div class="notice-meta"><span>관리자</span><span>2026.05.01</span><span>조회 1,234</span></div>
+        </div>
+        <div class="notice-card">
+          <div class="notice-badge">📌 공지</div>
+          <div class="notice-title">🎉 4월의 Best 캐츠 친구를 소개합니다.</div>
+          <div class="notice-meta"><span>관리자</span><span>2026.04.01</span><span>조회 892</span></div>
+        </div>
+      </div>
+
+      <!-- 게시글 목록 -->
+      <div class="post-list">
+        <div class="pl-header">
+          <div></div><div>제목</div><div>작성자</div><div>작성일</div><div style="text-align:right">조회수</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-dudu">두</div>
+          <div class="post-title-wrap"><span class="tag t-rec">추천</span><div class="post-title">캐츠 덕분에 영어 말하기 점수가 올랐어요! 정말 신기했어요 ✨</div></div>
+          <div class="post-auth">김*준</div><div class="post-date">2026.05.11</div><div class="post-views">328</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-latte">라</div>
+          <div class="post-title-wrap"><span class="tag t-rec">추천</span><div class="post-title">매일 10분씩 캐츠 했더니 영어 단어가 저절로 외워져요!</div></div>
+          <div class="post-auth">이*은</div><div class="post-date">2026.05.10</div><div class="post-views">256</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠잉글리시 시작한 지 100일! 날마다 학습 완료 도전 중이에요~</div></div>
+          <div class="post-auth">박*아</div><div class="post-date">2026.05.09</div><div class="post-views">189</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-prki">프</div>
+          <div class="post-title-wrap"><div class="post-title">어제 캐잉송 처음 들었는데 노래가 너무 신나요! 계속 흥얼거려요 🎵</div></div>
+          <div class="post-auth">최*서</div><div class="post-date">2026.05.09</div><div class="post-views">156</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-kamil">카</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠 덕분에 학교 영어 수업이 너무 쉬워졌어요 😊 친구들도 추천해요</div></div>
+          <div class="post-auth">정*현</div><div class="post-date">2026.05.08</div><div class="post-views">143</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-cat1">캣</div>
+          <div class="post-title-wrap"><div class="post-title">아이패드로 캐츠 하는데 그림이 너무 예뻐요! 캐릭터 다 좋아요</div></div>
+          <div class="post-auth">윤*린</div><div class="post-date">2026.05.08</div><div class="post-views">132</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠홈에서 엄마랑 같이 공부하니까 더 재미있어요</div></div>
+          <div class="post-auth">강*우</div><div class="post-date">2026.05.07</div><div class="post-views">97</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-dudu">두</div>
+          <div class="post-title-wrap"><div class="post-title">두두가 제일 귀여워요! 항상 두두 캐릭터로 글 쓸 거예요 🐱</div></div>
+          <div class="post-auth">오*하</div><div class="post-date">2026.05.06</div><div class="post-views">85</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이지네이션 — 하단 고정 -->
+    <div class="pagination">
+      <button class="pg-btn">‹</button>
+      <button class="pg-btn active">1</button>
+      <button class="pg-btn">2</button>
+      <button class="pg-btn">3</button>
+      <button class="pg-btn">4</button>
+      <button class="pg-btn">5</button>
+      <button class="pg-btn">›</button>
+    </div>
+  </div>
+
+  <!-- Best TIP 팝업 -->
+  <div class="modal-overlay" id="tip-modal" onclick="if(event.target===this)closeModal('tip-modal')">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('tip-modal')">✕</button>
+      <div class="modal-title">🏆 Best 캐츠 친구 당선 TIP</div>
+      <div class="tip-sec"><div class="tip-sec-t">✏️ 이런 글을 써보세요!</div><p>캐츠를 활용하면서 좋아진 점, 재미있었던 경험, 달라진 나의 영어 실력 등을 구체적으로 써주세요. 진심이 담긴 글일수록 당선 확률이 높아요!</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">🚫 이런 내용은 안 돼요</div><p>욕설, 비방, 광고, 게시판과 관련 없는 내용은 운영팀이 비공개 처리할 수 있어요.</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">📅 검수 및 공개 주기</div><p>작성한 글은 1주일 내로 검수 후 공개됩니다. 공개된 글은 내 글 보기에서 확인 가능해요!</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">🎁 냥 포인트 지급 기준</div><p>매달 공개된 게시글 중 100명 추첨! 5,000냥~10,000냥을 드려요. 포인트 지급일은 매월 운영팀에서 안내해 드려요.</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">📞 부모님께 연락드리는 방법</div><p>당선 시 등록된 보호자 연락처로 안내 드립니다. 연락처가 최신인지 확인해 주세요!</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 2: 내 글 보기 (글 있음) ===================== -->
+<div class="screen" id="my-posts">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title">
+          <div class="title-icon">📖</div>
+          친구들의 캐츠 활용기
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+          <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
+        </div>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn" onclick="showScreen('board-list')">전체 글 <span class="tab-c">4,320</span></div>
+        <div class="tab-btn active">내 글 보기 <span class="tab-c">3</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+    <div class="board-content">
+      <div class="post-list">
+        <div class="pl-header" style="grid-template-columns:44px 72px 1fr 96px 96px 150px">
+          <div></div><div>태그</div><div>제목</div><div>작성자</div><div>작성일</div><div>글 상태</div>
+        </div>
+        <div class="my-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-dudu">두</div>
+          <div class="tags"><span class="tag t-rec">추천</span></div>
+          <div class="post-title">캐츠 덕분에 영어 말하기 점수가 올랐어요! 정말 신기했어요 ✨</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.05.11</div>
+          <div><span class="st-badge st-pub">● 함께 보는 글</span></div>
+        </div>
+        <div class="my-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-latte">라</div>
+          <div class="tags"></div>
+          <div class="post-title">매일 10분씩 캐츠 했더니 영어 단어가 저절로 외워진다는 게 신기해요</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.04.20</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+        <div class="my-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="tags"></div>
+          <div class="post-title">샘이랑 공부하면 진짜 재미있어요! 샘 짱짱!</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.03.15</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+      </div>
+
+      <div style="background:#FFF8F5;border:1px solid #FFE0C2;border-radius:10px;padding:14px 18px">
+        <div style="font-size:13px;font-weight:700;color:#D97706;margin-bottom:8px">📋 글 상태 안내</div>
+        <div style="font-size:13px;color:#78350F;line-height:1.8">
+          <strong>함께 보는 글</strong> — 친구들과 함께 볼 수 있어요.<br>
+          <strong>나만 보는 글</strong> — 캐츠에서 친구의 글을 아직 확인하는 중이거나, 확인했지만 함께 볼 수 없는 글이에요.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 3: 내 글 없음 ===================== -->
+<div class="screen" id="my-posts-empty">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title"><div class="title-icon">📖</div>친구들의 캐츠 활용기</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+          <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
+        </div>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn" onclick="showScreen('board-list')">전체 글 <span class="tab-c">4,320</span></div>
+        <div class="tab-btn active">내 글 보기 <span class="tab-c">0</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+    <div class="board-content" style="align-items:center;justify-content:center">
+      <div class="empty-state">
+        <div class="empty-icon">🐱</div>
+        <div class="empty-text">친구가 작성한 글이 아직 없어요^^</div>
+        <div class="empty-sub">첫 번째 이야기를 들려주세요!<br>당선되면 냥 포인트도 받을 수 있어요 🎁</div>
+        <button class="btn-write-lg" onclick="showScreen('write-post')">✏️ 첫 글 쓰러 가기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 4: 게시글 상세 ===================== -->
+<div class="screen" id="post-detail">
+  <div class="board-wrap">
+    <div class="detail-wrap">
+      <div class="detail-inner">
+        <div class="back-link" onclick="showScreen('board-list')">← 목록으로 돌아가기</div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <div class="detail-tags"><span class="tag t-rec">추천</span></div>
+            <div class="detail-title">캐츠 덕분에 영어 말하기 점수가 올랐어요! 정말 신기했어요 ✨</div>
+            <div class="detail-meta">
+              <div class="detail-av-wrap">
+                <div class="char-av c-dudu" style="width:40px;height:40px;font-size:16px">두</div>
+                <div>
+                  <div class="detail-author">두두</div>
+                  <div class="detail-sub">김*준 · 2026.05.11</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-body">
+            안녕하세요! 저는 캐츠잉글리시를 3개월 동안 꾸준히 했는데요. 처음에는 영어 말하기가 너무 어렵고 부끄러웠는데, 캐츠로 매일 조금씩 연습하다 보니까 이제는 학교 영어 수업에서 발표도 할 수 있게 됐어요! 🎉<br><br>
+            특히 캐잉송을 따라 부르다 보면 단어가 자연스럽게 외워지는 게 신기했어요. 두두 캐릭터가 너무 귀엽고 재미있어서 매일 접속하게 돼요 😊<br><br>
+            여러분도 포기하지 말고 조금씩 해보세요! 저도 했으니까 여러분도 할 수 있어요!
+          </div>
+          <div class="detail-foot">
+            <div class="back-link" onclick="showScreen('board-list')" style="margin:0">← 목록으로</div>
+            <div class="detail-views">조회수 328</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 5: 글쓰기 ===================== -->
+<div class="screen" id="write-post">
+  <div class="write-wrap">
+    <div class="write-inner">
+      <div class="write-head">
+        <button class="back-btn" onclick="showScreen('board-list')">←</button>
+        <div class="write-heading">✏️ 나의 캐츠 활용기 쓰기</div>
+      </div>
+
+      <div class="write-sec">
+        <div class="write-sec-title">① 캐릭터 선택</div>
+        <div class="char-grid">
+          <div class="char-item" onclick="selChar(this)">
+            <div class="char-circle c-sam">샘</div><div class="char-name">샘</div>
+          </div>
+          <div class="char-item sel" onclick="selChar(this)">
+            <div class="char-circle c-dudu">두</div><div class="char-name">두두</div>
+          </div>
+          <div class="char-item" onclick="selChar(this)">
+            <div class="char-circle c-latte">라</div><div class="char-name">라떼</div>
+          </div>
+          <div class="char-item" onclick="selChar(this)">
+            <div class="char-circle c-kamil">카</div><div class="char-name">카밀</div>
+          </div>
+          <div class="char-item" onclick="selChar(this)">
+            <div class="char-circle c-prki">프</div><div class="char-name">프키</div>
+          </div>
+          <div class="char-item" onclick="selChar(this)">
+            <div class="char-circle c-cat1">캣</div><div class="char-name">캣-1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="write-sec">
+        <div class="write-sec-title">② 제목 입력</div>
+        <input type="text" class="w-input" placeholder="제목을 입력해 주세요" maxlength="40" oninput="updCnt(this,'tc',40)">
+        <div class="w-count"><span id="tc">0</span> / 40자</div>
+      </div>
+
+      <div class="write-sec">
+        <div class="write-sec-title">③ 활용기 작성</div>
+        <textarea class="w-input" placeholder="캐츠를 활용하면서 좋았던 점, 재미있었던 경험, 달라진 나의 영어 실력을 자유롭게 써주세요!&#10;(예: 캐츠 덕분에 영어가 쉬워졌어요, 캐잉송이 너무 좋아요 등)" oninput="updCnt(this,'cc',1000)"></textarea>
+        <div class="w-count"><span id="cc">0</span> / 1000자</div>
+      </div>
+
+      <div class="write-sec" style="padding:14px 18px">
+        <div class="promise-box">
+          <div class="promise-title">📜 캐츠 친구들이 꼭 지켜야 할 약속</div>
+          여기는 모두가 기분 좋게 글을 쓰는 공간이에요.<br>
+          욕설, 나쁜 말, 친구를 놀리는 말은 절대 쓰면 안 돼요!<br>
+          우리 함께 멋진 게시판을 만들어 봐요 ♡<br>
+          <span style="color:#D97706;font-size:12px">※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="openModal('submit-modal')">등록하기</button>
+    </div>
+  </div>
+
+  <!-- 등록 완료 팝업 -->
+  <div class="modal-overlay" id="submit-modal" onclick="if(event.target===this)closeModal('submit-modal')">
+    <div class="modal-box" style="max-width:400px;text-align:center">
+      <div class="modal-ok-icon">🎉</div>
+      <div class="modal-ok-title">친구의 이야기를 들려줘서 고마워요 ♡</div>
+      <div class="modal-ok-text">
+        작성해준 글은 1주일 내에 등록될 예정이에요!<br>
+        <span style="font-size:12px;color:#9CA3AF">※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은<br>다른 친구들과 함께 볼 수 없어요.</span>
+      </div>
+      <button class="modal-ok-btn" onclick="closeModal('submit-modal');showScreen('board-list')">네 알겠습니다.</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 6: CAS 어드민 ===================== -->
+<div class="screen" id="admin">
+  <div class="admin-layout">
+    <div class="admin-sb">
+      <div class="admin-logo"><span>CAS</span> 어드민</div>
+      <div class="admin-grp">게시판 관리</div>
+      <div class="admin-item active">📋 캐츠 활용기 관리</div>
+      <div class="admin-item">📌 공지 관리</div>
+      <div class="admin-item">✍️ 관리자 글쓰기</div>
+      <div class="admin-grp">데이터</div>
+      <div class="admin-item">📊 통계</div>
+      <div class="admin-item">⬇️ 데이터 추출</div>
+      <div class="admin-grp">설정</div>
+      <div class="admin-item">⚙️ 게시판 설정</div>
+      <div class="admin-item">👤 권한 관리</div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-bar">
+        <div class="admin-pg-title">캐츠 활용기 게시글 관리</div>
+        <div class="admin-acts">
+          <button class="a-btn a-btn-s">⬇️ 엑셀 다운로드</button>
+          <button class="a-btn a-btn-p">✍️ 관리자 글쓰기</button>
+        </div>
+      </div>
+      <div class="admin-body">
+        <div class="filter-bar">
+          <select class="a-sel"><option>공개 여부 전체</option><option>공개 (Y)</option><option>비공개 (N)</option></select>
+          <select class="a-sel"><option>태그 전체</option><option>공지</option><option>추천</option><option>일반</option></select>
+          <input class="a-search" placeholder="제목, 작성자 검색">
+          <button class="a-btn a-btn-p" style="padding:7px 20px">검색</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="a-tbl">
+            <thead>
+              <tr>
+                <th>번호</th><th>태그</th><th>제목</th><th>작성자</th>
+                <th>작성일</th><th>조회</th><th>공개여부</th><th>추천</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span class="a-tag at-n">공지</span></td>
+                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">5월의 Best 캐츠 친구를 소개합니다!</td>
+                <td>관리자</td><td>2026.05.01</td><td>1,234</td>
+                <td><div class="toggle"><div class="tw on"><div class="td"></div></div><span style="font-size:12px;color:#22C55E;font-weight:700">Y</span></div></td>
+                <td>—</td>
+                <td><button class="a-btn a-btn-s" style="font-size:12px;padding:4px 10px">수정</button></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span class="a-tag at-r">추천</span></td>
+                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">캐츠 덕분에 영어 말하기 점수가 올랐어요!</td>
+                <td>김*준</td><td>2026.05.11</td><td>328</td>
+                <td><div class="toggle"><div class="tw on"><div class="td"></div></div><span style="font-size:12px;color:#22C55E;font-weight:700">Y</span></div></td>
+                <td><div class="toggle"><div class="tw on"><div class="td"></div></div></div></td>
+                <td><button class="a-btn a-btn-s" style="font-size:12px;padding:4px 10px">수정</button></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span class="a-tag at-g">일반</span></td>
+                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">매일 10분씩 캐츠 했더니 영어 단어가 저절로 외워져요!</td>
+                <td>이*은</td><td>2026.05.10</td><td>0</td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div><span style="font-size:12px;color:#9CA3AF;font-weight:700">N</span></div></td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div></div></td>
+                <td><button class="a-btn a-btn-s" style="font-size:12px;padding:4px 10px">수정</button></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span class="a-tag at-g">일반</span></td>
+                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">캐츠잉글리시 시작한 지 100일! 날마다 학습 완료 도전 중</td>
+                <td>박*아</td><td>2026.05.09</td><td>0</td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div><span style="font-size:12px;color:#9CA3AF;font-weight:700">N</span></div></td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div></div></td>
+                <td><button class="a-btn a-btn-s" style="font-size:12px;padding:4px 10px">수정</button></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span class="a-tag at-g">일반</span></td>
+                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">어제 캐잉송 처음 들었는데 노래가 너무 신나요!</td>
+                <td>최*서</td><td>2026.05.09</td><td>0</td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div><span style="font-size:12px;color:#9CA3AF;font-weight:700">N</span></div></td>
+                <td><div class="toggle"><div class="tw off"><div class="td"></div></div></div></td>
+                <td><button class="a-btn a-btn-s" style="font-size:12px;padding:4px 10px">수정</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 7: 내 글 보기 (페이징) ===================== -->
+<div class="screen" id="my-posts-paging">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title">
+          <div class="title-icon">📖</div>
+          친구들의 캐츠 활용기
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+          <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
+        </div>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn" onclick="showScreen('board-list')">전체 글 <span class="tab-c">4,320</span></div>
+        <div class="tab-btn active">내 글 보기 <span class="tab-c">6</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+    <div class="board-content">
+      <div class="post-list">
+        <div class="pl-header" style="grid-template-columns:44px 72px 1fr 96px 96px 150px">
+          <div></div><div>태그</div><div>제목</div><div>작성자</div><div>작성일</div><div>글 상태</div>
+        </div>
+        <div class="my-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-dudu">두</div>
+          <div class="tags"><span class="tag t-rec">추천</span></div>
+          <div class="post-title">캐츠 덕분에 영어 말하기 점수가 올랐어요! 정말 신기했어요 ✨</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.05.11</div>
+          <div><span class="st-badge st-pub">● 함께 보는 글</span></div>
+        </div>
+        <div class="my-row">
+          <div class="char-av c-latte">라</div>
+          <div class="tags"></div>
+          <div class="post-title">매일 10분씩 캐츠 했더니 영어 단어가 저절로 외워진다는 게 신기해요</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.04.20</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+        <div class="my-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="tags"></div>
+          <div class="post-title">샘이랑 공부하면 진짜 재미있어요! 샘 짱짱!</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.03.15</div>
+          <div><span class="st-badge st-pub">● 함께 보는 글</span></div>
+        </div>
+        <div class="my-row">
+          <div class="char-av c-kamil">카</div>
+          <div class="tags"></div>
+          <div class="post-title">캐잉송 따라 부르다가 단어를 다 외웠어요! 너무 신기해요</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.03.01</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+        <div class="my-row">
+          <div class="char-av c-prki">프</div>
+          <div class="tags"></div>
+          <div class="post-title">영어 말하기 연습 30일 달성! 캐츠랑 같이 해서 더 재밌어요</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.02.18</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+        <div class="my-row">
+          <div class="char-av c-cat1">캣</div>
+          <div class="tags"></div>
+          <div class="post-title">처음에는 어려웠는데 캐츠 3개월 하고 나니 훨씬 쉬워졌어요</div>
+          <div class="post-auth">고*미</div><div class="post-date">2026.02.05</div>
+          <div><span class="st-badge st-prv">● 나만 보는 글</span></div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">4</button>
+        <button class="pg-btn">5</button>
+        <button class="pg-btn">›</button>
+      </div>
+
+      <div style="background:#FFF8F5;border:1px solid #FFE0C2;border-radius:10px;padding:14px 18px">
+        <div style="font-size:13px;font-weight:700;color:#D97706;margin-bottom:8px">📋 글 상태 안내</div>
+        <div style="font-size:13px;color:#78350F;line-height:1.8">
+          <strong>함께 보는 글</strong> — 친구들과 함께 볼 수 있어요.<br>
+          <strong>나만 보는 글</strong> — 캐츠에서 친구의 글을 아직 확인하는 중이거나, 확인했지만 함께 볼 수 없는 글이에요.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 8: 전체 글 — 빈 화면 ===================== -->
+<div class="screen" id="board-list-empty">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title">
+          <div class="title-icon">📖</div>
+          친구들의 캐츠 활용기
+          <span class="post-count">게시글 수 : <strong>0</strong>개</span>
+        </div>
+        <button class="btn-tip" onclick="openModal('tip-modal')">🏆 Best 캐츠 친구 당선 TIP</button>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn active">전체 글 <span class="tab-c">0</span></div>
+        <div class="tab-btn" onclick="showScreen('my-posts')">내 글 보기 <span class="tab-c">3</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+
+    <div class="board-content" style="align-items:center;justify-content:center">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">아직 게시된 글이 없습니다</div>
+        <div class="empty-sub">첫 번째 활용기를 올려보세요!<br>매달 추첨을 통해 냥 포인트를 드려요 🎁</div>
+        <button class="btn-write-lg" onclick="showScreen('write-post')">✏️ 첫 글 쓰러 가기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best TIP 팝업 (빈화면 화면용) -->
+  <div class="modal-overlay" id="tip-modal-empty" onclick="if(event.target===this)closeModal('tip-modal-empty')">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('tip-modal-empty')">✕</button>
+      <div class="modal-title">🏆 Best 캐츠 친구 당선 TIP</div>
+      <div class="tip-sec"><div class="tip-sec-t">✏️ 이런 글을 써보세요!</div><p>캐츠를 활용하면서 좋아진 점, 재미있었던 경험, 달라진 나의 영어 실력 등을 구체적으로 써주세요. 진심이 담긴 글일수록 당선 확률이 높아요!</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">🚫 이런 내용은 안 돼요</div><p>욕설, 비방, 광고, 게시판과 관련 없는 내용은 운영팀이 비공개 처리할 수 있어요.</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">📅 검수 및 공개 주기</div><p>작성한 글은 1주일 내로 검수 후 공개됩니다.</p></div>
+      <div class="tip-sec"><div class="tip-sec-t">🎁 냥 포인트 지급 기준</div><p>매달 공개된 게시글 중 100명 추첨! 5,000냥~10,000냥을 드려요.</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .device-frame -->
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById(id);
+  if (s) s.classList.add('active');
+  document.querySelectorAll('.nav-btn[data-sc]').forEach(b => b.classList.remove('active'));
+  const b = document.querySelector(`.nav-btn[data-sc="${id}"]`);
+  if (b) b.classList.add('active');
+}
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.add('active');
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.remove('active');
+}
+function selChar(el) {
+  el.closest('.char-grid').querySelectorAll('.char-item').forEach(i => i.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function updCnt(el, cid, max) {
+  const c = document.getElementById(cid);
+  if (c) c.textContent = el.value.length;
+}
+</script>
+</body>
+</html>
