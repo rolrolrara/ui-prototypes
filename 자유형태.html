@@ -27,6 +27,8 @@ body{background:#1A1A2E;display:flex;flex-direction:column;align-items:center;mi
 .post-count strong{color:#FF6B35;font-weight:700}
 .btn-tip{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1.5px solid #F59E0B;border-radius:24px;padding:8px 18px;cursor:pointer;font-size:13px;font-weight:700;color:#B45309;transition:all .2s}
 .btn-tip:hover{background:linear-gradient(135deg,#FFF3CD,#FFE082)}
+.btn-guide{display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #D1D5DB;border-radius:24px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:700;color:#374151;transition:all .2s}
+.btn-guide:hover{background:#F9FAFB;border-color:#9CA3AF}
 
 /* Tabs */
 .board-tabs{display:flex;align-items:center}
@@ -179,7 +181,8 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
 <body>
 <nav class="proto-nav">
   <span class="pnl">화면</span>
-  <button class="nav-btn active" data-sc="board-list" onclick="showScreen('board-list')">게시판 목록</button>
+  <button class="nav-btn active" data-sc="board-list" onclick="showScreen('board-list')">게시판 목록 (A안)</button>
+  <button class="nav-btn" data-sc="board-list-v2" onclick="showScreen('board-list-v2')">게시판 목록 (B안)</button>
   <button class="nav-btn" data-sc="my-posts" onclick="showScreen('my-posts')">내 글 보기</button>
   <button class="nav-btn" data-sc="my-posts-empty" onclick="showScreen('my-posts-empty')">내 글 없음</button>
   <button class="nav-btn" data-sc="post-detail" onclick="showScreen('post-detail')">게시글 상세</button>
@@ -204,8 +207,9 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
           <div class="title-icon">📖</div>
           친구들의 캐츠 활용기
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn-tip" onclick="openModal('tip-modal')">🏆 Best 캐츠 친구 당선 TIP</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="openModal('tip-modal')">Best 당선 TIP</button>
           <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
         </div>
       </div>
@@ -291,17 +295,181 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
       <button class="pg-btn">›</button>
     </div>
   </div>
+</div>
+
+<!-- ── 공유 모달 (device-frame 내 모든 화면에서 사용) ── -->
+  <div class="modal-overlay" id="guide-modal" onclick="if(event.target===this)closeModal('guide-modal')">
+    <div class="modal-box" style="overflow-y:hidden;padding:24px 28px 20px;width:560px">
+      <button class="modal-close" onclick="closeModal('guide-modal')">✕</button>
+      <div class="modal-title" style="font-size:15px;margin-bottom:14px">📝 캐츠 활용기 이용안내</div>
+
+      <!-- 이용안내 3항목 → 하나의 박스 안 리스트 -->
+      <div style="background:#F9FAFB;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#374151;line-height:1.6">
+          <span style="color:#FF6B35;flex-shrink:0">•</span>
+          <span>작성한 글은 캐츠에서 확인한 뒤 게시판에 등록돼요. 보통 일주일 안에 등록되지만 참여글이 많으면 조금 더 걸릴 수 있으니 여유있게 기다려 주세요~</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#374151;line-height:1.6">
+          <span style="color:#FF6B35;flex-shrink:0">•</span>
+          <span>모두가 함께 보는 게시판이므로 캐츠와 관련 없는 이야기, 의미 없는 글, 나쁜 말 등은 등록되지 않으니 유의해 주세요.</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#374151;line-height:1.6">
+          <span style="color:#FF6B35;flex-shrink:0">•</span>
+          <span>당선된 친구는 부모님께 문자나 전화로 자세히 안내드릴 거예요. 당선 연락이 오기를 기다려 주세요.</span>
+        </div>
+      </div>
+
+      <!-- 냥포인트 선물 안내 -->
+      <div style="font-size:13px;font-weight:700;color:#FF6B35;margin-bottom:10px">🎁 냥포인트 선물 안내</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:#FFF8E1;border:1.5px solid #F59E0B;border-radius:12px;padding:14px">
+          <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:6px">1. 당선 선물 🏆</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6">'Best 캐츠 친구'로 소개되면<br><strong>3만냥포인트</strong> 선물!</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:6px">소개된 달 15일에 적립</div>
+        </div>
+        <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:14px">
+          <div style="font-size:12px;font-weight:700;color:#16A34A;margin-bottom:6px">2. 추첨 선물 🎉</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6">추첨으로 선정되면<br><strong>500냥포인트</strong> 선물!</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:6px">다음달 10일 지급 / 100명 선정</div>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;background:#F3F4F6;border-radius:8px;font-size:12px;color:#6B7280">* 선물 받은 냥포인트는 [마이룸]에서 확인할 수 있어요.</div>
+    </div>
+  </div>
 
   <!-- Best TIP 팝업 -->
   <div class="modal-overlay" id="tip-modal" onclick="if(event.target===this)closeModal('tip-modal')">
-    <div class="modal-box">
+    <div class="modal-box" style="width:680px;overflow-y:hidden;padding:22px 26px 18px">
       <button class="modal-close" onclick="closeModal('tip-modal')">✕</button>
-      <div class="modal-title">🏆 Best 캐츠 친구 당선 TIP</div>
-      <div class="tip-sec"><div class="tip-sec-t">✏️ 이런 글을 써보세요!</div><p>캐츠를 활용하면서 좋아진 점, 재미있었던 경험, 달라진 나의 영어 실력 등을 구체적으로 써주세요. 진심이 담긴 글일수록 당선 확률이 높아요!</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">🚫 이런 내용은 안 돼요</div><p>욕설, 비방, 광고, 게시판과 관련 없는 내용은 운영팀이 비공개 처리할 수 있어요.</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">📅 검수 및 공개 주기</div><p>작성한 글은 1주일 내로 검수 후 공개됩니다. 공개된 글은 내 글 보기에서 확인 가능해요!</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">🎁 냥 포인트 지급 기준</div><p>매달 공개된 게시글 중 100명 추첨! 5,000냥~10,000냥을 드려요. 포인트 지급일은 매월 운영팀에서 안내해 드려요.</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">📞 부모님께 연락드리는 방법</div><p>당선 시 등록된 보호자 연락처로 안내 드립니다. 연락처가 최신인지 확인해 주세요!</p></div>
+      <div class="modal-title" style="margin-bottom:8px">🏆 Best 당선 TIP</div>
+      <div style="font-size:12px;font-weight:700;color:#1A1A2E;margin-bottom:10px">캐츠 활용기 작성하기</div>
+
+      <!-- ①②③ 3열 나란히 배치 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">① 제목부터 눈길 끌기!</div>
+          <p style="margin-bottom:4px">예시)</p>
+          <p>· 폭슬리랑 영어 말하기 해봤다~신나!<br>· 우리집에 캐츠잉글리시가 생긴 날~<br>· 캐츠로 문제풀고 이번 단평 100점!! ㅎㅎ</p>
+        </div>
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">② 경험은 구체적으로!<br><span style="font-weight:800;color:#E94560">다른 친구가 읽어도 "와~나도 해보고 싶다!" 싶게 쓰기!</span></div>
+          <p style="margin-bottom:4px">· 단순하게 "좋아요" "재밌어요"는 &rarr; <strong style="color:#E94560">X</strong><br>· 캐잉 하기 전은 영어 단어 외우는게 힘들었는데 지금은 쉬워졌어 &rarr; <strong style="color:#16A34A">O</strong></p>
+          <p style="margin-bottom:4px">예시)</p>
+          <p>· 틀려도 폭슬리가 칭찬해줘서 다시 했어요!<br>· 오답노트 풀기 싫었지만 그래도 풀고 나면 뿌듯하고 기분 좋아요<br>· 시험 전엔 평가대비집중학습을 꼭 풀고 있어. 그래서 시험 결과가 좋았어!</p>
+        </div>
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">③ 마지막은 친구들에게 응원 한마디로 마무리 해보기</div>
+          <p>예시)<br>· 캐츠로 열심히 공부해서 1등하자!</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px;padding:9px 14px;background:#FFF3F3;border-radius:8px;font-size:12px;color:#B91C1C">
+        ※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.
+      </div>
+
+      <div style="background:#1A1A2E;border-radius:12px;padding:12px 16px">
+        <div style="font-size:12px;font-weight:800;color:#F59E0B;margin-bottom:8px">※ 보너스 : 당선 확률 올라가는 치트키</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 길다고 좋은 건 아니에요!</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ "나는 어떤 사람일까?"를 한 문장으로 말해보세요.</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 재미+진심+나만의 이야기 = BEST</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 친구가 읽고 "아, 너다!" 하면 성공 😊</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- ===================== SCREEN 1-B: 게시판 목록 (B안 — 공지 1개 + 안내 배너) ===================== -->
+<div class="screen" id="board-list-v2">
+  <div class="board-wrap">
+    <div class="board-header">
+      <div class="board-title-row">
+        <div class="board-title">
+          <div class="title-icon">📖</div>
+          친구들의 캐츠 활용기
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="openModal('tip-modal')">Best 당선 TIP</button>
+          <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
+        </div>
+      </div>
+      <div class="board-tabs">
+        <div class="tab-btn active">전체 글 <span class="tab-c">4,320</span></div>
+        <div class="tab-btn" onclick="showScreen('my-posts')">내 글 보기 <span class="tab-c">3</span></div>
+        <div class="tab-sp"></div>
+        <button class="btn-write" onclick="showScreen('write-post')">✏️ 글쓰기</button>
+      </div>
+    </div>
+
+    <div class="board-content">
+      <!-- 안내 문구(왼쪽) + 공지(오른쪽) 반반 -->
+      <div style="display:grid;grid-template-columns:11fr 9fr;gap:12px">
+        <div class="notice-card" onclick="showScreen('post-detail')" style="overflow:visible">
+          <div class="notice-badge">📌 공지</div>
+          <div class="notice-title" style="white-space:normal;overflow:visible;text-overflow:unset">🏆 5월의 Best 캐츠 친구를 소개합니다!</div>
+          <div class="notice-meta"><span>관리자</span><span>2026.05.01</span><span>조회 1,234</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;gap:3px;padding:4px 0">
+          <div style="font-size:13px;color:#374151;line-height:1.7">나만의 캐츠 활용 Tip, 시험 결과, 자랑하고 싶은 이야기 등, 친구만의 이야기를 자유롭게 올려주세요!</div>
+          <div style="font-size:13px;color:#374151;line-height:1.7">공개된 게시글 중 매월 추첨을 통해 <strong style="color:#D97706">100명에게는 500냥</strong> 선물!</div>
+          <div style="font-size:13px;color:#374151;line-height:1.7"><strong style="color:#E94560">'Best 캐츠 친구'</strong>로 뽑히면 <strong style="color:#E94560">3만냥포인트</strong>를 받을 수 있어요~</div>
+        </div>
+      </div>
+
+      <!-- 게시글 목록 -->
+      <div class="post-list">
+        <div class="pl-header">
+          <div></div><div>제목</div><div>작성자</div><div>작성일</div><div style="text-align:right">조회수</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-dudu">두</div>
+          <div class="post-title-wrap"><span class="tag t-rec">추천</span><div class="post-title">캐츠 덕분에 영어 말하기 점수가 올랐어요! 정말 신기했어요 ✨</div></div>
+          <div class="post-auth">김*준</div><div class="post-date">2026.05.11</div><div class="post-views">328</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-latte">라</div>
+          <div class="post-title-wrap"><span class="tag t-rec">추천</span><div class="post-title">매일 10분씩 캐츠 했더니 영어 단어가 저절로 외워져요!</div></div>
+          <div class="post-auth">이*은</div><div class="post-date">2026.05.10</div><div class="post-views">256</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠잉글리시 시작한 지 100일! 날마다 학습 완료 도전 중이에요~</div></div>
+          <div class="post-auth">박*아</div><div class="post-date">2026.05.09</div><div class="post-views">189</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-prki">프</div>
+          <div class="post-title-wrap"><div class="post-title">어제 캐잉송 처음 들었는데 노래가 너무 신나요! 계속 흥얼거려요 🎵</div></div>
+          <div class="post-auth">최*서</div><div class="post-date">2026.05.09</div><div class="post-views">156</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-kamil">카</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠 덕분에 학교 영어 수업이 너무 쉬워졌어요 😊 친구들도 추천해요</div></div>
+          <div class="post-auth">정*현</div><div class="post-date">2026.05.08</div><div class="post-views">143</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-cat1">캣</div>
+          <div class="post-title-wrap"><div class="post-title">아이패드로 캐츠 하는데 그림이 너무 예뻐요! 캐릭터 다 좋아요</div></div>
+          <div class="post-auth">윤*린</div><div class="post-date">2026.05.08</div><div class="post-views">132</div>
+        </div>
+        <div class="post-row" onclick="showScreen('post-detail')">
+          <div class="char-av c-sam">샘</div>
+          <div class="post-title-wrap"><div class="post-title">캐츠홈에서 엄마랑 같이 공부하니까 더 재미있어요</div></div>
+          <div class="post-auth">강*우</div><div class="post-date">2026.05.07</div><div class="post-views">97</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination">
+      <button class="pg-btn">‹</button>
+      <button class="pg-btn active">1</button>
+      <button class="pg-btn">2</button>
+      <button class="pg-btn">3</button>
+      <button class="pg-btn">4</button>
+      <button class="pg-btn">5</button>
+      <button class="pg-btn">›</button>
     </div>
   </div>
 </div>
@@ -315,8 +483,9 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
           <div class="title-icon">📖</div>
           친구들의 캐츠 활용기
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">Best 당선 TIP</button>
           <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
         </div>
       </div>
@@ -372,8 +541,9 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
     <div class="board-header">
       <div class="board-title-row">
         <div class="board-title"><div class="title-icon">📖</div>친구들의 캐츠 활용기</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">Best 당선 TIP</button>
           <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
         </div>
       </div>
@@ -605,8 +775,9 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
           <div class="title-icon">📖</div>
           친구들의 캐츠 활용기
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">🏆 Best 캐츠 친구 당선 TIP</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="showScreen('board-list');setTimeout(()=>openModal('tip-modal'),80)">Best 당선 TIP</button>
           <button style="background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;padding:2px 4px" title="닫기">✕</button>
         </div>
       </div>
@@ -697,7 +868,10 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
           친구들의 캐츠 활용기
           <span class="post-count">게시글 수 : <strong>0</strong>개</span>
         </div>
-        <button class="btn-tip" onclick="openModal('tip-modal')">🏆 Best 캐츠 친구 당선 TIP</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-guide" onclick="openModal('guide-modal')">이용안내</button>
+          <button class="btn-tip" onclick="openModal('tip-modal')">Best 당선 TIP</button>
+        </div>
       </div>
       <div class="board-tabs">
         <div class="tab-btn active">전체 글 <span class="tab-c">0</span></div>
@@ -719,13 +893,42 @@ textarea.w-input{resize:none;height:110px;line-height:1.7}
 
   <!-- Best TIP 팝업 (빈화면 화면용) -->
   <div class="modal-overlay" id="tip-modal-empty" onclick="if(event.target===this)closeModal('tip-modal-empty')">
-    <div class="modal-box">
+    <div class="modal-box" style="width:680px;overflow-y:hidden;padding:22px 26px 18px">
       <button class="modal-close" onclick="closeModal('tip-modal-empty')">✕</button>
-      <div class="modal-title">🏆 Best 캐츠 친구 당선 TIP</div>
-      <div class="tip-sec"><div class="tip-sec-t">✏️ 이런 글을 써보세요!</div><p>캐츠를 활용하면서 좋아진 점, 재미있었던 경험, 달라진 나의 영어 실력 등을 구체적으로 써주세요. 진심이 담긴 글일수록 당선 확률이 높아요!</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">🚫 이런 내용은 안 돼요</div><p>욕설, 비방, 광고, 게시판과 관련 없는 내용은 운영팀이 비공개 처리할 수 있어요.</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">📅 검수 및 공개 주기</div><p>작성한 글은 1주일 내로 검수 후 공개됩니다.</p></div>
-      <div class="tip-sec"><div class="tip-sec-t">🎁 냥 포인트 지급 기준</div><p>매달 공개된 게시글 중 100명 추첨! 5,000냥~10,000냥을 드려요.</p></div>
+      <div class="modal-title" style="margin-bottom:8px">🏆 Best 당선 TIP</div>
+      <div style="font-size:12px;font-weight:700;color:#1A1A2E;margin-bottom:10px">캐츠 활용기 작성하기</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">① 제목부터 눈길 끌기!</div>
+          <p style="margin-bottom:4px">예시)</p>
+          <p>· 폭슬리랑 영어 말하기 해봤다~신나!<br>· 우리집에 캐츠잉글리시가 생긴 날~<br>· 캐츠로 문제풀고 이번 단평 100점!! ㅎㅎ</p>
+        </div>
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">② 경험은 구체적으로!<br><span style="font-weight:800;color:#E94560">다른 친구가 읽어도 "와~나도 해보고 싶다!" 싶게 쓰기!</span></div>
+          <p style="margin-bottom:4px">· 단순하게 "좋아요" "재밌어요"는 &rarr; <strong style="color:#E94560">X</strong><br>· 캐잉 하기 전은 영어 단어 외우는게 힘들었는데 지금은 쉬워졌어 &rarr; <strong style="color:#16A34A">O</strong></p>
+          <p style="margin-bottom:4px">예시)</p>
+          <p>· 틀려도 폭슬리가 칭찬해줘서 다시 했어요!<br>· 오답노트 풀기 싫었지만 그래도 풀고 나면 뿌듯하고 기분 좋아요<br>· 시험 전엔 평가대비집중학습을 꼭 풀고 있어. 그래서 시험 결과가 좋았어!</p>
+        </div>
+        <div class="tip-sec" style="margin-bottom:0">
+          <div class="tip-sec-t">③ 마지막은 친구들에게 응원 한마디로 마무리 해보기</div>
+          <p>예시)<br>· 캐츠로 열심히 공부해서 1등하자!</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px;padding:9px 14px;background:#FFF3F3;border-radius:8px;font-size:12px;color:#B91C1C">
+        ※ 나쁜 말을 쓰거나 게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.
+      </div>
+
+      <div style="background:#1A1A2E;border-radius:12px;padding:12px 16px">
+        <div style="font-size:12px;font-weight:800;color:#F59E0B;margin-bottom:8px">※ 보너스 : 당선 확률 올라가는 치트키</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 길다고 좋은 건 아니에요!</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ "나는 어떤 사람일까?"를 한 문장으로 말해보세요.</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 재미+진심+나만의 이야기 = BEST</div>
+          <div style="font-size:12px;color:#F3F4F6;line-height:1.7">✓ 친구가 읽고 "아, 너다!" 하면 성공 😊</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
