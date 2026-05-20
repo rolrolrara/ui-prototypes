@@ -1356,87 +1356,84 @@
       </div>
     </div>
 
-    <!-- ⑨ 이용 및 선물 안내 (독립 화면 — 어노테이션용) -->
+    <!-- ⑨ 이용 및 선물 안내 (모달과 동일한 모양의 독립 화면) -->
     <div class="screen" id="screen-info">
-      <div class="page-hd">
-        <button class="back-btn" onclick="showScreen('screen-board')">←</button>
-        <div class="page-hd-title">이용 및 선물 안내</div>
-      </div>
-      <div class="screen-body">
-        <div style="max-width:720px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px 28px;">
-          <div class="modal-section-title">📝 캐츠 활용기 이용안내</div>
-          <ul class="modal-list" style="margin-bottom:20px;">
-            <li>작성한 글은 캐츠에서 확인한 뒤 게시판에 등록돼요. 보통 일주일 안에 등록되지만 참여글이 많으면 조금 더 걸릴 수 있으니 여유있게 기다려 주세요~</li>
-            <li>모두가 함께 보는 게시판이므로 캐츠와 관련 없는 이야기, 의미 없는 글, 나쁜 말 등은 등록되지 않으니 유의해 주세요.</li>
-            <li>모두가 믿고 볼 수 있는 게시판을 만들기 위해 글 수정과 삭제 기능은 제공되지 않아요. 글을 올리기 전에 내용을 꼭 확인해 주세요.</li>
-            <li>당선된 친구는 부모님께 문자나 전화로 자세히 안내드릴 거예요. 당선 연락이 오기를 기다려 주세요.</li>
-          </ul>
-          <div class="modal-section-title">🎁 냥포인트 선물 안내</div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin:10px 0 5px;">1. 당선 선물</div>
-          <ul class="modal-list" style="margin-bottom:12px;">
-            <li>'Best 캐츠 친구'로 소개되면 3만냥포인트를 선물로 받을 수 있어요. (소개된 달 15일에 적립)</li>
-          </ul>
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;">2. 추첨 선물</div>
-          <ul class="modal-list" style="margin-bottom:14px;">
-            <li>아쉽게 선정되지 않더라도 잘 작성해 준 친구들 중 추첨을 통해 500냥포인트를 선물로 받을 수 있어요. (작성일 기준 다음달 10일에 지급 / 총 100명 선정)</li>
-          </ul>
-          <div style="font-size:12px;color:var(--text-muted);">* 선물 받은 냥포인트는 [마이룸]에서 확인할 수 있어요.</div>
-          <div style="text-align:center;margin-top:24px;">
-            <button class="modal-btn" onclick="showScreen('screen-board')" style="background:var(--primary);color:#fff;border:none;padding:10px 32px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;">확인했어요!</button>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+        <div class="modal" style="max-height:none;overflow-y:visible;">
+          <button class="modal-close" onclick="showScreen('screen-board')">✕</button>
+          <div class="modal-title">이용 및 선물 안내</div>
+          <div class="modal-body">
+            <div class="modal-section-title">📝 캐츠 활용기 이용안내</div>
+            <ul class="modal-list" style="margin-bottom:16px;">
+              <li>작성한 글은 캐츠에서 확인한 뒤 게시판에 등록돼요. 보통 일주일 안에 등록되지만 참여글이 많으면 조금 더 걸릴 수 있으니 여유있게 기다려 주세요~</li>
+              <li>모두가 함께 보는 게시판이므로 캐츠와 관련 없는 이야기, 의미 없는 글, 나쁜 말 등은 등록되지 않으니 유의해 주세요.</li>
+              <li>모두가 믿고 볼 수 있는 게시판을 만들기 위해 글 수정과 삭제 기능은 제공되지 않아요. 글을 올리기 전에 내용을 꼭 확인해 주세요.</li>
+              <li>당선된 친구는 부모님께 문자나 전화로 자세히 안내드릴 거예요. 당선 연락이 오기를 기다려 주세요.</li>
+            </ul>
+            <div class="modal-section-title">🎁 냥포인트 선물 안내</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin:8px 0 4px;">1. 당선 선물</div>
+            <ul class="modal-list" style="margin-bottom:10px;">
+              <li>'Best 캐츠 친구'로 소개되면 3만냥포인트를 선물로 받을 수 있어요. (소개된 달 15일에 적립)</li>
+            </ul>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">2. 추첨 선물</div>
+            <ul class="modal-list" style="margin-bottom:12px;">
+              <li>아쉽게 선정되지 않더라도 잘 작성해 준 친구들 중 추첨을 통해 500냥포인트를 선물로 받을 수 있어요. (작성일 기준 다음달 10일에 지급 / 총 100명 선정)</li>
+            </ul>
+            <div style="font-size:12px;color:var(--text-muted);">* 선물 받은 냥포인트는 [마이룸]에서 확인할 수 있어요.</div>
           </div>
+          <button class="modal-btn" onclick="showScreen('screen-board')">확인했어요!</button>
         </div>
       </div>
     </div>
 
-    <!-- ⑩ Best 당선 TIP (독립 화면 — 어노테이션용) -->
+    <!-- ⑩ Best 당선 TIP (모달과 동일한 모양의 독립 화면) -->
     <div class="screen" id="screen-tip">
-      <div class="page-hd">
-        <button class="back-btn" onclick="showScreen('screen-board')">←</button>
-        <div class="page-hd-title">캐츠 활용기 Best 당선 TIP</div>
-      </div>
-      <div class="screen-body">
-        <div style="max-width:720px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px 28px;">
-          <!-- ① 제목 -->
-          <div style="background:#E8F5E9;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
-            <div style="font-size:14px;font-weight:800;color:#2E7D32;margin-bottom:5px;">① 제목부터 눈길 끌기!</div>
-            <div style="color:#4B5563;line-height:1.6;font-size:13px;">
-              <span style="font-weight:700;">예시)</span> 폭슬리랑 영어 말하기 해봤다~신나! · 우리집에 캐츠잉글리시가 생긴 날~ · 캐츠로 문제풀고 이번 단행 100점!! ㅎㅎ
-            </div>
-          </div>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+        <div class="modal" style="max-width:500px;max-height:none;overflow-y:visible;padding:22px 24px 20px;">
+          <button class="modal-close" onclick="showScreen('screen-board')">✕</button>
+          <div class="modal-title" style="font-size:15px;margin-bottom:14px;text-align:center;">캐츠 활용기 Best 당선 TIP</div>
+          <div class="modal-body" style="font-size:12px;">
 
-          <!-- ② 경험 구체적으로 -->
-          <div style="background:#E8F5E9;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
-            <div style="font-size:14px;font-weight:800;color:#2E7D32;margin-bottom:5px;">② 경험은 구체적으로!</div>
-            <div style="color:#1F2937;font-weight:700;margin-bottom:6px;line-height:1.5;font-size:13px;">다른 친구가 읽어도 "와~나도 해보고 싶다!" 쉽게 쓰기!</div>
-            <div style="color:#4B5563;line-height:1.6;font-size:13px;">
-              ❌ 단순하게 "좋아요" "재밌어요"는 X<br>
-              ✅ 캐잉 하기 전엔 단어 외우기 힘들었는데 지금은 쉬워졌어 O
+            <!-- ① 제목 -->
+            <div style="background:#E8F5E9;border-radius:8px;padding:9px 12px;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:4px;">① 제목부터 눈길 끌기!</div>
+              <div style="color:#4B5563;line-height:1.6;">
+                <span style="font-weight:700;">예시)</span> 폭슬리랑 영어 말하기 해봤다~신나! · 우리집에 캐츠잉글리시가 생긴 날~ · 캐츠로 문제풀고 이번 단행 100점!! ㅎㅎ
+              </div>
             </div>
-            <div style="color:#6B7280;margin-top:6px;line-height:1.6;font-size:13px;">
-              <span style="font-weight:700;">예시)</span> 틀려도 폭슬리가 칭찬해줘서 다시 하게 됐어요. · 오답노트 풀기 싫었지만 풀고 나면 뿌듯해요. · 시험 전엔 평가대비집중학습을 꼭 풀어요!
+
+            <!-- ② 경험 구체적으로 -->
+            <div style="background:#E8F5E9;border-radius:8px;padding:9px 12px;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:4px;">② 경험은 구체적으로!</div>
+              <div style="color:#1F2937;font-weight:700;margin-bottom:5px;line-height:1.5;">다른 친구가 읽어도 "와~나도 해보고 싶다!" 쉽게 쓰기!</div>
+              <div style="color:#4B5563;line-height:1.6;">
+                ❌ 단순하게 "좋아요" "재밌어요"는 X<br>
+                ✅ 캐잉 하기 전엔 단어 외우기 힘들었는데 지금은 쉬워졌어 O
+              </div>
+              <div style="color:#6B7280;margin-top:5px;line-height:1.6;">
+                <span style="font-weight:700;">예시)</span> 틀려도 폭슬리가 칭찬해줘서 다시 하게 됐어요. · 오답노트 풀기 싫었지만 풀고 나면 뿌듯해요. · 시험 전엔 평가대비집중학습을 꼭 풀어요!
+              </div>
             </div>
-          </div>
 
-          <!-- ③ 마무리 -->
-          <div style="background:#E8F5E9;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
-            <div style="font-size:14px;font-weight:800;color:#2E7D32;margin-bottom:5px;">③ 마지막은 응원 한마디로 마무리!</div>
-            <div style="color:#4B5563;line-height:1.6;font-size:13px;"><span style="font-weight:700;">예시)</span> 캐츠로 열심히 공부해서 1등하자!</div>
-          </div>
-
-          <!-- 보너스 치트키 -->
-          <div style="background:#FFF9C4;border:1px solid #F59E0B;border-radius:8px;padding:12px 14px;">
-            <div style="font-size:13px;font-weight:800;color:#92400E;margin-bottom:8px;">※ 보너스 : 당선 확률 올라가는 치트키</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;color:#4B5563;line-height:1.6;font-size:13px;">
-              <div>✔ 길다고 좋은 건 아니에요!</div>
-              <div>✔ "나는 어떤 사람일까?"를 한 문장으로</div>
-              <div>✔ 재미+진심+나만의 이야기 = BEST</div>
-              <div>✔ 친구가 읽고 "아, 너다!" 하면 성공 😊</div>
+            <!-- ③ 마무리 -->
+            <div style="background:#E8F5E9;border-radius:8px;padding:9px 12px;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:4px;">③ 마지막은 응원 한마디로 마무리!</div>
+              <div style="color:#4B5563;line-height:1.6;"><span style="font-weight:700;">예시)</span> 캐츠로 열심히 공부해서 1등하자!</div>
             </div>
-          </div>
 
-          <div style="text-align:center;margin-top:24px;">
-            <button class="modal-btn" onclick="showScreen('screen-board')" style="background:var(--primary);color:#fff;border:none;padding:10px 32px;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;">알겠어요!</button>
+            <!-- 보너스 치트키 -->
+            <div style="background:#FFF9C4;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;">
+              <div style="font-size:12px;font-weight:800;color:#92400E;margin-bottom:6px;">※ 보너스 : 당선 확률 올라가는 치트키</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;color:#4B5563;line-height:1.6;">
+                <div>✔ 길다고 좋은 건 아니에요!</div>
+                <div>✔ "나는 어떤 사람일까?"를 한 문장으로</div>
+                <div>✔ 재미+진심+나만의 이야기 = BEST</div>
+                <div>✔ 친구가 읽고 "아, 너다!" 하면 성공 😊</div>
+              </div>
+            </div>
+
           </div>
+          <button class="modal-btn" onclick="showScreen('screen-board')" style="margin-top:14px;">알겠어요!</button>
         </div>
       </div>
     </div>
