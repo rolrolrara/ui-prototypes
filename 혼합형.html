@@ -147,14 +147,22 @@
     .page-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
 
     /* ===== SCREEN 4: WRITE ===== */
-    #screen-write .screen-body { padding: 24px 40px; overflow: hidden; display: flex; flex-direction: column; }
-    #screen-write .write-form-wrap { max-width: 720px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; width: 100%; }
-    #screen-write .write-form { padding: 24px; flex: 1; display: flex; flex-direction: column; margin: 0; width: 100%; }
-    #screen-write .form-section { margin-bottom: 12px; }
-    #screen-write .form-section.body-section { flex: 1; display: flex; flex-direction: column; margin-bottom: 0; }
-    #screen-write .textarea-wrap { position: relative; flex: 1; display: flex; }
-    #screen-write .textarea-wrap textarea { flex: 1; height: auto; }
-    #screen-write .submit-area { margin-top: 14px; }
+    #screen-write .screen-body,
+    #screen-write-filled .screen-body { padding: 24px 40px; overflow: hidden; display: flex; flex-direction: column; }
+    #screen-write .write-form-wrap,
+    #screen-write-filled .write-form-wrap { max-width: 720px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; width: 100%; }
+    #screen-write .write-form,
+    #screen-write-filled .write-form { padding: 24px; flex: 1; display: flex; flex-direction: column; margin: 0; width: 100%; }
+    #screen-write .form-section,
+    #screen-write-filled .form-section { margin-bottom: 12px; }
+    #screen-write .form-section.body-section,
+    #screen-write-filled .form-section.body-section { flex: 1; display: flex; flex-direction: column; margin-bottom: 0; }
+    #screen-write .textarea-wrap,
+    #screen-write-filled .textarea-wrap { position: relative; flex: 1; display: flex; }
+    #screen-write .textarea-wrap textarea,
+    #screen-write-filled .textarea-wrap textarea { flex: 1; height: auto; }
+    #screen-write .submit-area,
+    #screen-write-filled .submit-area { margin-top: 14px; }
     .write-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
     .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; }
     .write-title { font-size: 20px; font-weight: 900; color: var(--text); }
@@ -184,6 +192,16 @@
     .submit-area { text-align: center; margin-top: 18px; }
     .btn-submit { background: var(--primary); color: #fff; border: none; padding: 12px 48px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; font-family: inherit; }
     .btn-submit:hover { background: #e55a28; }
+    .btn-submit:disabled,
+    .btn-submit[disabled] { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
+    .btn-submit:disabled:hover,
+    .btn-submit[disabled]:hover { background: #E5E7EB; }
+    .submit-hint { font-size: 13px; color: #6B7280; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .submit-hint-icon { font-size: 14px; }
+
+    /* ===== 유효성 안내 (입력 전 가이드) ===== */
+    .field-hint { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px; color: #EA580C; font-weight: 600; }
+    .field-hint-icon { font-size: 13px; }
 
     /* ===== 유효성 검사 에러 상태 ===== */
     .form-input.error,
@@ -299,8 +317,9 @@
     <button class="nav-btn" onclick="showScreen('screen-my')">③ 내 글(있음)</button>
     <button class="nav-btn" onclick="showScreen('screen-my-paging')">④ 내 글(페이징)</button>
     <button class="nav-btn" onclick="showScreen('screen-my-empty')">⑤ 내 글(없음)</button>
-    <button class="nav-btn" onclick="showScreen('screen-write')">⑥ 글쓰기</button>
-    <button class="nav-btn" onclick="showScreen('screen-write-invalid')">⑥-1 글쓰기 (유효성 오류)</button>
+    <button class="nav-btn" onclick="showScreen('screen-write')">⑥ 글쓰기 (입력 전)</button>
+    <button class="nav-btn" onclick="showScreen('screen-write-invalid')">⑥-1 글쓰기 (유효성 안내)</button>
+    <button class="nav-btn" onclick="showScreen('screen-write-filled')">⑥-2 글쓰기 (입력 후)</button>
     <button class="nav-btn" onclick="showScreen('screen-detail')">⑦ 게시글 상세</button>
     <button class="nav-btn" onclick="showScreen('screen-detail-long')">⑦-1 게시글 상세 (스크롤)</button>
     <button class="nav-btn" onclick="showScreen('screen-complete')">⑧ 등록완료</button>
@@ -866,20 +885,15 @@
             </div>
           </div>
           <div class="submit-area">
-            <button class="btn-submit" onclick="showScreen('screen-complete')">등록하기</button>
+            <button class="btn-submit" disabled>등록하기</button>
           </div>
         </div>
         </div>
       </div>
     </div>
 
-    <!-- ⑥-1 글쓰기 (유효성 검사 오류) -->
+    <!-- ⑥-1 글쓰기 (유효성 안내 - 입력 전) -->
     <div class="screen" id="screen-write-invalid">
-      <!-- 상단 토스트 알림 -->
-      <div class="form-toast">
-        <span class="form-toast-icon">⚠️</span>
-        <span>아직 채우지 않은 곳이 있어요! 표시된 곳을 확인해 주세요.</span>
-      </div>
       <div class="page-hd">
         <button class="back-btn" onclick="showScreen('screen-board')">←</button>
         <div class="page-hd-title">캐츠 활용기 작성하기</div>
@@ -914,19 +928,19 @@
               </div>
             </div>
           </div>
-          <!-- 제목 (에러) -->
+          <!-- 제목 (미입력 안내) -->
           <div class="form-section">
             <label class="form-label">제목 <span class="required">*</span></label>
             <div style="position:relative;">
-              <input type="text" class="form-input error" style="padding-right:60px;" placeholder="게시판에 반영될 제목을 적어 주세요. (최대 40자)" maxlength="40" value="">
+              <input type="text" class="form-input" style="padding-right:60px;" placeholder="게시판에 반영될 제목을 적어 주세요. (최대 40자)" maxlength="40" value="">
               <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">0/40</div>
             </div>
-            <div class="field-error">
-              <span class="field-error-icon">✏️</span>
-              <span>제목을 적어 주세요!</span>
+            <div class="field-hint">
+              <span class="field-hint-icon">✏️</span>
+              <span>제목을 적으면 등록할 수 있어요!</span>
             </div>
           </div>
-          <!-- 본문 (에러) -->
+          <!-- 본문 (미입력 안내) -->
           <div class="form-section body-section">
             <label class="form-label">내 이야기 <span class="required">*</span></label>
             <div class="promise-box" style="margin-bottom:8px;padding:10px 14px;">
@@ -937,12 +951,79 @@
               </ul>
             </div>
             <div class="textarea-wrap">
-              <textarea class="form-textarea error" style="padding-bottom:32px;" maxlength="3000" placeholder="‘캐츠로 공부하는 나’의 이야기를 자유롭게 써주세요. :)&#10;(예: 캐츠 활용팁, 시험 결과 자랑, 캐츠로 공부하며 달라진 점, 기억에 남는 에피소드 등)"></textarea>
+              <textarea class="form-textarea" style="padding-bottom:32px;" maxlength="3000" placeholder="‘캐츠로 공부하는 나’의 이야기를 자유롭게 써주세요. :)&#10;(예: 캐츠 활용팁, 시험 결과 자랑, 캐츠로 공부하며 달라진 점, 기억에 남는 에피소드 등)"></textarea>
               <div style="position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">0/3000</div>
             </div>
-            <div class="field-error">
-              <span class="field-error-icon">💭</span>
-              <span>어떤 이야기를 써 볼까요? 내 이야기를 적어 주세요!</span>
+            <div class="field-hint">
+              <span class="field-hint-icon">💭</span>
+              <span>어떤 이야기를 써 볼까요? 내 이야기를 적으면 등록할 수 있어요!</span>
+            </div>
+          </div>
+          <div class="submit-area">
+            <button class="btn-submit" disabled>등록하기</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥-2 글쓰기 (입력 후 - 등록 가능) -->
+    <div class="screen" id="screen-write-filled">
+      <div class="page-hd">
+        <button class="back-btn" onclick="showScreen('screen-board')">←</button>
+        <div class="page-hd-title">캐츠 활용기 작성하기</div>
+      </div>
+      <div class="screen-body">
+        <div class="write-form-wrap">
+          <div class="write-form">
+          <!-- 캐릭터 선택 -->
+          <div class="form-section">
+            <label class="form-label" style="display:flex;align-items:baseline;gap:8px;">
+              <span>캐릭터 선택 <span class="required">*</span></span>
+              <span style="font-size:12px;font-weight:normal;color:var(--text-muted);">제목에 같이 나올 캐츠 프렌즈를 골라주세요!</span>
+            </label>
+            <div class="char-select">
+              <div class="char-option" onclick="selectChar(this)">
+                <div class="char-option-icon">🐱</div><div class="char-option-name">샘</div>
+              </div>
+              <div class="char-option" onclick="selectChar(this)">
+                <div class="char-option-icon">🐶</div><div class="char-option-name">두두</div>
+              </div>
+              <div class="char-option" onclick="selectChar(this)">
+                <div class="char-option-icon">☕</div><div class="char-option-name">라떼</div>
+              </div>
+              <div class="char-option" onclick="selectChar(this)">
+                <div class="char-option-icon">🌸</div><div class="char-option-name">카밀</div>
+              </div>
+              <div class="char-option selected" onclick="selectChar(this)">
+                <div class="char-option-icon">🦊</div><div class="char-option-name">프키</div>
+              </div>
+              <div class="char-option" onclick="selectChar(this)">
+                <div class="char-option-icon">🐈</div><div class="char-option-name">캣-1</div>
+              </div>
+            </div>
+          </div>
+          <!-- 제목 (입력 완료) -->
+          <div class="form-section">
+            <label class="form-label">제목 <span class="required">*</span></label>
+            <div style="position:relative;">
+              <input type="text" class="form-input" style="padding-right:60px;" placeholder="게시판에 반영될 제목을 적어 주세요. (최대 40자)" maxlength="40" value="캐츠로 영어 30일 도전 완료했어요! 🦊">
+              <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">22/40</div>
+            </div>
+          </div>
+          <!-- 본문 (입력 완료) -->
+          <div class="form-section body-section">
+            <label class="form-label">내 이야기 <span class="required">*</span></label>
+            <div class="promise-box" style="margin-bottom:8px;padding:10px 14px;">
+              <div class="promise-box-title">⭐ 캐츠 친구들의 약속</div>
+              <ul>
+                <li>욕설·나쁜 말·친구를 놀리는 내용은 쓰면 안 돼요!</li>
+                <li>게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.</li>
+              </ul>
+            </div>
+            <div class="textarea-wrap">
+              <textarea class="form-textarea" style="padding-bottom:32px;" maxlength="3000" placeholder="‘캐츠로 공부하는 나’의 이야기를 자유롭게 써주세요. :)&#10;(예: 캐츠 활용팁, 시험 결과 자랑, 캐츠로 공부하며 달라진 점, 기억에 남는 에피소드 등)">처음에는 영어가 너무 어렵게 느껴졌는데, 캐츠로 매일 10분씩 꾸준히 하다보니 어느새 30일이 됐어요! 단어도 많이 외워졌고 듣기도 잘 되는 것 같아요. 앞으로도 꾸준히 해서 100일까지 도전해보고 싶어요 🎉</textarea>
+              <div style="position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">142/3000</div>
             </div>
           </div>
           <div class="submit-area">
