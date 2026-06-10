@@ -320,6 +320,7 @@
     <button class="nav-btn" onclick="showScreen('screen-write')">⑥ 글쓰기 (입력 전)</button>
     <button class="nav-btn" onclick="showScreen('screen-write-invalid')">⑥-1 글쓰기 (유효성 안내)</button>
     <button class="nav-btn" onclick="showScreen('screen-write-filled')">⑥-2 글쓰기 (입력 후)</button>
+    <button class="nav-btn" onclick="showScreen('screen-write-back')">⑥-3 글쓰기 뒤로가기 팝업</button>
     <button class="nav-btn" onclick="showScreen('screen-detail')">⑦ 게시글 상세</button>
     <button class="nav-btn" onclick="showScreen('screen-detail-long')">⑦-1 게시글 상세 (스크롤)</button>
     <button class="nav-btn" onclick="showScreen('screen-complete')">⑧ 등록완료</button>
@@ -972,7 +973,7 @@
     <!-- ⑥-2 글쓰기 (입력 후 - 등록 가능) -->
     <div class="screen" id="screen-write-filled">
       <div class="page-hd">
-        <button class="back-btn" onclick="showScreen('screen-board')">←</button>
+        <button class="back-btn" onclick="openModal('modal-write-back')">←</button>
         <div class="page-hd-title">캐츠 활용기 작성하기</div>
       </div>
       <div class="screen-body">
@@ -1032,6 +1033,19 @@
             <button class="btn-submit" onclick="showScreen('screen-complete')">등록하기</button>
           </div>
         </div>
+        </div>
+      </div>
+
+      <!-- 뒤로가기 확인 팝업 -->
+      <div class="modal-overlay" id="modal-write-back">
+        <div class="modal" style="max-width:360px;text-align:center;">
+          <div class="modal-icon">✏️</div>
+          <div class="modal-title">글 작성을 그만할까요?</div>
+          <div class="modal-body">지금까지 작성한 내용은<br>저장되지 않아요.</div>
+          <div style="display:flex;gap:8px;margin-top:20px;">
+            <button onclick="closeModal('modal-write-back')" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;color:var(--text);">계속 작성할게요</button>
+            <button onclick="showScreen('screen-board')" style="flex:1;padding:12px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;">그만 작성할게요</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1434,6 +1448,71 @@
 
           </div>
           <button class="modal-btn" onclick="showScreen('screen-board')" style="margin-top:14px;">알겠어요!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥-3 글쓰기 뒤로가기 팝업 (독립 화면) -->
+    <div class="screen" id="screen-write-back">
+      <div class="page-hd">
+        <button class="back-btn" style="opacity:0.4;pointer-events:none;">←</button>
+        <div class="page-hd-title">캐츠 활용기 작성하기</div>
+      </div>
+      <div class="screen-body">
+        <div class="write-form-wrap">
+          <div class="write-form">
+            <div class="form-section">
+              <label class="form-label" style="display:flex;align-items:baseline;gap:8px;">
+                <span>캐릭터 선택 <span class="required">*</span></span>
+                <span style="font-size:12px;font-weight:normal;color:var(--text-muted);">제목에 같이 나올 캐츠 프렌즈를 골라주세요!</span>
+              </label>
+              <div class="char-select">
+                <div class="char-option"><div class="char-option-icon">🐱</div><div class="char-option-name">샘</div></div>
+                <div class="char-option"><div class="char-option-icon">🐶</div><div class="char-option-name">두두</div></div>
+                <div class="char-option"><div class="char-option-icon">☕</div><div class="char-option-name">라떼</div></div>
+                <div class="char-option"><div class="char-option-icon">🌸</div><div class="char-option-name">카밀</div></div>
+                <div class="char-option selected"><div class="char-option-icon">🦊</div><div class="char-option-name">프키</div></div>
+                <div class="char-option"><div class="char-option-icon">🐈</div><div class="char-option-name">캣-1</div></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">제목 <span class="required">*</span></label>
+              <div style="position:relative;">
+                <input type="text" class="form-input" style="padding-right:60px;" value="캐츠로 영어 30일 도전 완료했어요! 🦊" readonly>
+                <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">22/40</div>
+              </div>
+            </div>
+            <div class="form-section body-section">
+              <label class="form-label">내 이야기 <span class="required">*</span></label>
+              <div class="promise-box" style="margin-bottom:8px;padding:10px 14px;">
+                <div class="promise-box-title">⭐ 캐츠 친구들의 약속</div>
+                <ul>
+                  <li>욕설·나쁜 말·친구를 놀리는 내용은 쓰면 안 돼요!</li>
+                  <li>게시판과 관련 없는 글은 다른 친구들과 함께 볼 수 없어요.</li>
+                </ul>
+              </div>
+              <div class="textarea-wrap">
+                <textarea class="form-textarea" style="padding-bottom:32px;" readonly>처음에는 영어가 너무 어렵게 느껴졌는데, 캐츠로 매일 10분씩 꾸준히 하다보니 어느새 30일이 됐어요! 단어도 많이 외워졌고 듣기도 잘 되는 것 같아요. 앞으로도 꾸준히 해서 100일까지 도전해보고 싶어요 🎉</textarea>
+                <div style="position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">142/3000</div>
+              </div>
+            </div>
+            <div class="submit-area">
+              <button class="btn-submit">등록하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 팝업 — 초기부터 열린 상태 -->
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;">
+        <div class="modal" style="max-width:360px;text-align:center;">
+          <div class="modal-icon">✏️</div>
+          <div class="modal-title">글 작성을 그만할까요?</div>
+          <div class="modal-body">지금까지 작성한 내용은<br>저장되지 않아요.</div>
+          <div style="display:flex;gap:8px;margin-top:20px;">
+            <button onclick="showScreen('screen-write-filled')" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;color:var(--text);">계속 작성할게요</button>
+            <button onclick="showScreen('screen-board')" style="flex:1;padding:12px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;">그만 작성할게요</button>
+          </div>
         </div>
       </div>
     </div>
