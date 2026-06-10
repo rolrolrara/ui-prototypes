@@ -1038,13 +1038,28 @@
 
       <!-- 뒤로가기 확인 팝업 -->
       <div class="modal-overlay" id="modal-write-back">
-        <div class="modal" style="max-width:360px;text-align:center;">
-          <div class="modal-icon">✏️</div>
-          <div class="modal-title">글 작성을 그만할까요?</div>
-          <div class="modal-body">지금까지 작성한 내용은<br>저장되지 않아요.</div>
-          <div style="display:flex;gap:8px;margin-top:20px;">
-            <button onclick="closeModal('modal-write-back')" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;color:var(--text);">계속 작성할게요</button>
-            <button onclick="showScreen('screen-board')" style="flex:1;padding:12px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;">그만 작성할게요</button>
+        <div class="modal" style="max-width:400px;padding:0;overflow:hidden;border-radius:20px;text-align:center;">
+          <!-- 보라색 헤더 -->
+          <div style="background:#6B4EFF;padding:16px 20px;display:flex;align-items:center;justify-content:center;position:relative;">
+            <span style="color:#FFD740;font-size:18px;margin-right:8px;">⚠</span>
+            <span style="color:#fff;font-size:17px;font-weight:900;">글 쓰기를 그만할까요?</span>
+            <button onclick="closeModal('modal-write-back')" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:2px 4px;">✕</button>
+          </div>
+          <!-- 흰 바디 -->
+          <div style="background:#fff;padding:28px 28px 24px;">
+            <!-- 일러스트 영역 -->
+            <div style="margin-bottom:16px;font-size:64px;line-height:1;">🐻</div>
+            <!-- 안내 문구 -->
+            <div style="font-size:15px;font-weight:700;color:#6B4EFF;margin-bottom:24px;">지금까지 쓴 내용은 저장되지 않아요.</div>
+            <!-- 버튼 -->
+            <div style="display:flex;gap:12px;">
+              <button onclick="closeModal('modal-write-back')" style="flex:1;padding:13px 0;border-radius:50px;border:2.5px solid #6B4EFF;background:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;color:#6B4EFF;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span style="font-size:16px;">✏️</span> 계속 쓰기
+              </button>
+              <button onclick="showScreen('screen-board')" style="flex:1;padding:13px 0;border-radius:50px;border:2.5px solid #6B4EFF;background:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;color:#6B4EFF;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span style="font-size:16px;">✕</span> 그만 쓰기
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1505,13 +1520,25 @@
 
       <!-- 팝업 — 초기부터 열린 상태 -->
       <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;">
-        <div class="modal" style="max-width:360px;text-align:center;">
-          <div class="modal-icon">✏️</div>
-          <div class="modal-title">글 작성을 그만할까요?</div>
-          <div class="modal-body">지금까지 작성한 내용은<br>저장되지 않아요.</div>
-          <div style="display:flex;gap:8px;margin-top:20px;">
-            <button onclick="showScreen('screen-write-filled')" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;color:var(--text);">계속 작성할게요</button>
-            <button onclick="showScreen('screen-board')" style="flex:1;padding:12px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;">그만 작성할게요</button>
+        <div class="modal" style="max-width:400px;padding:0;overflow:hidden;border-radius:20px;text-align:center;">
+          <!-- 보라색 헤더 -->
+          <div style="background:#6B4EFF;padding:16px 20px;display:flex;align-items:center;justify-content:center;position:relative;">
+            <span style="color:#FFD740;font-size:18px;margin-right:8px;">⚠</span>
+            <span style="color:#fff;font-size:17px;font-weight:900;">글 쓰기를 그만할까요?</span>
+            <button onclick="showScreen('screen-write-filled')" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:2px 4px;">✕</button>
+          </div>
+          <!-- 흰 바디 -->
+          <div style="background:#fff;padding:28px 28px 24px;">
+            <div style="margin-bottom:16px;font-size:64px;line-height:1;">🐻</div>
+            <div style="font-size:15px;font-weight:700;color:#6B4EFF;margin-bottom:24px;">지금까지 쓴 내용은 저장되지 않아요.</div>
+            <div style="display:flex;gap:12px;">
+              <button onclick="showScreen('screen-write-filled')" style="flex:1;padding:13px 0;border-radius:50px;border:2.5px solid #6B4EFF;background:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;color:#6B4EFF;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span style="font-size:16px;">✏️</span> 계속 쓰기
+              </button>
+              <button onclick="showScreen('screen-board')" style="flex:1;padding:13px 0;border-radius:50px;border:2.5px solid #6B4EFF;background:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;color:#6B4EFF;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span style="font-size:16px;">✕</span> 그만 쓰기
+              </button>
+            </div>
           </div>
         </div>
       </div>
