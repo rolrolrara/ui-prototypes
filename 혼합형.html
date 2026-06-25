@@ -196,6 +196,9 @@
     .btn-submit[disabled] { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
     .btn-submit:disabled:hover,
     .btn-submit[disabled]:hover { background: #E5E7EB; }
+    /* 비활성처럼 보이지만 클릭은 되는 버튼 (입력 전 등록하기 → 토스트 안내) */
+    .btn-submit.is-disabled { background: #E5E7EB; color: #9CA3AF; box-shadow: none; cursor: pointer; }
+    .btn-submit.is-disabled:hover { background: #D1D5DB; }
     .submit-hint { font-size: 13px; color: #6B7280; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .submit-hint-icon { font-size: 14px; }
 
@@ -210,8 +213,11 @@
     .form-textarea.error:focus { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12); }
     .field-error { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; color: #DC2626; font-weight: 600; }
     .field-error-icon { font-size: 14px; }
-    /* 토스트 형태 알림 - device-frame 기준 절대 위치 */
-    .form-toast { position: absolute; left: 50%; top: 24px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: #FEF3C7; border: 1.5px solid #F59E0B; border-radius: 999px; padding: 12px 22px; font-size: 14px; color: #92400E; font-weight: 700; box-shadow: 0 10px 28px rgba(0,0,0,0.18); z-index: 50; white-space: nowrap; }
+    /* 토스트는 입력 박스 영역에만 보이도록 클리핑 (박스 안에서 슬라이드 업, textarea 포커스 링은 영향 없음) */
+    .toast-clip { position: absolute; inset: 0; overflow: hidden; border-radius: 8px; pointer-events: none; z-index: 40; }
+    /* 토스트 형태 알림 - 입력 박스(toast-clip) 하단에서 슬라이드 업/다운 */
+    .form-toast { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%) translateY(40px); opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 8px; background: #FEF3C7; border: 1.5px solid #F59E0B; border-radius: 999px; padding: 13px 26px; font-size: 14px; color: #92400E; font-weight: 700; box-shadow: 0 12px 30px rgba(0,0,0,0.20); z-index: 50; white-space: nowrap; transition: transform .34s cubic-bezier(.22,1,.36,1), opacity .28s ease; }
+    .form-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .form-toast-icon { font-size: 18px; }
 
     /* ===== screen-write-invalid: 에러 메시지가 추가되어도 입력 필드 크기는 그대로 유지, 넘치면 스크롤 ===== */
@@ -885,10 +891,15 @@
             <div class="textarea-wrap">
               <textarea class="form-textarea" style="padding-bottom:32px;" maxlength="3000" oninput="updateCount(this,'body-count')" placeholder="‘캐츠로 공부하는 나’의 이야기를 자유롭게 써주세요. :)&#10;(예: 캐츠 활용팁, 시험 결과 자랑, 캐츠로 공부하며 달라진 점, 기억에 남는 에피소드 등)"></textarea>
               <div style="position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;"><span id="body-count">0</span>/3000</div>
+              <div class="toast-clip">
+                <div class="form-toast" role="alert">
+                  <span>아직 채우지 않은 곳이 있어요! 표시된 곳을 확인해 주세요.</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="submit-area">
-            <button class="btn-submit" disabled>등록하기</button>
+            <button class="btn-submit is-disabled" onclick="showEmptyToast(this)">등록하기</button>
           </div>
         </div>
         </div>
@@ -956,6 +967,11 @@
             <div class="textarea-wrap">
               <textarea class="form-textarea" style="padding-bottom:32px;" maxlength="3000" placeholder="‘캐츠로 공부하는 나’의 이야기를 자유롭게 써주세요. :)&#10;(예: 캐츠 활용팁, 시험 결과 자랑, 캐츠로 공부하며 달라진 점, 기억에 남는 에피소드 등)"></textarea>
               <div style="position:absolute;right:12px;bottom:10px;font-size:12px;color:var(--text-muted);background:#fff;padding:0 4px;pointer-events:none;">0/3000</div>
+              <div class="toast-clip">
+                <div class="form-toast show" role="alert">
+                  <span>아직 채우지 않은 곳이 있어요! 표시된 곳을 확인해 주세요.</span>
+                </div>
+              </div>
             </div>
             <div class="field-hint">
               <span class="field-hint-icon">💭</span>
@@ -1575,10 +1591,35 @@
     function updateCount(input, countId) {
       const el = document.getElementById(countId);
       if (el) el.textContent = input.value.length;
+      // 입력을 시작하면 미입력 표시(빨간 테두리) 해제
+      if (input.value.trim()) input.classList.remove('error');
     }
     function closeBanner(id) {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
+    }
+    // 입력 전 화면에서 '등록하기' 선택 시: 미입력이면 토스트를 입력 박스 하단에서
+    // 슬라이드 업 → 잠시 유지 → 슬라이드 다운으로 노출/숨김
+    function showEmptyToast(btn) {
+      const screen = btn.closest('.screen');
+      if (!screen) return;
+      const title = screen.querySelector('.form-input');
+      const body  = screen.querySelector('.form-textarea');
+      const titleEmpty = !title || !title.value.trim();
+      const bodyEmpty  = !body  || !body.value.trim();
+      // 모두 채워졌으면 정상 등록 흐름으로
+      if (!titleEmpty && !bodyEmpty) { showScreen('screen-complete'); return; }
+      // 비어 있는 필수 항목을 빨간 테두리로 '표시'
+      if (title) title.classList.toggle('error', titleEmpty);
+      if (body)  body.classList.toggle('error', bodyEmpty);
+      // 토스트 슬라이드 업 → 2.2초 유지 → 슬라이드 다운
+      const toast = screen.querySelector('.form-toast');
+      if (!toast) return;
+      toast.classList.remove('show');
+      void toast.offsetWidth;          // 애니메이션 재시작용 reflow
+      toast.classList.add('show');
+      clearTimeout(toast._hideTimer);
+      toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2000);
     }
   </script>
 </body>
