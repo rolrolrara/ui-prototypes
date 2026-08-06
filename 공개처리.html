@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게시글 공개/비공개 처리 프로토타입 — CATS-20527</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background:#f0f2f5; display:flex; flex-direction:column; align-items:center; min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+  .proto-nav { display:flex; gap:4px; padding:10px; background:#1e1e2e; width:100%; flex-wrap:wrap; justify-content:center; }
+  .nav-btn { background:#2a2a3e; border:none; color:#aaa; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .nav-btn.active { background:#6366f1; color:#fff; }
+  .device-frame { width:1334px; height:800px; background:#fff; overflow:auto; position:relative; box-shadow:0 4px 24px rgba(0,0,0,.15); margin:16px auto; }
+  .screen { display:none; width:100%; min-height:100%; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ── CAS 공통 레이아웃 ─────────────────────────── */
+  .gnb { display:flex; align-items:center; gap:28px; padding:0 24px; height:52px; border-bottom:1px solid #e5e7eb; background:#fff; flex-shrink:0; }
+  .gnb .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:#111827; }
+  .gnb .logo .dot { width:18px; height:18px; border-radius:50%; background:conic-gradient(#f59e0b,#ef4444,#6366f1,#22c55e,#f59e0b); }
+  .gnb a { font-size:14px; color:#374151; text-decoration:none; padding:15px 2px; }
+  .gnb a.on { color:#2563eb; font-weight:700; border-bottom:2px solid #2563eb; }
+  .gnb .right { margin-left:auto; font-size:13px; color:#6b7280; }
+  .layout { display:flex; flex:1; min-height:0; }
+  .sidebar { width:180px; background:#1f2937; color:#cbd5e1; flex-shrink:0; padding-top:12px; }
+  .sidebar .profile { display:flex; align-items:center; gap:8px; padding:14px 16px 18px; font-size:14px; color:#e5e7eb; }
+  .sidebar .avatar { width:28px; height:28px; border-radius:50%; background:#64748b; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .sidebar .menu { display:block; padding:11px 16px; font-size:13.5px; cursor:pointer; }
+  .sidebar .menu.on { background:#111827; color:#fff; font-weight:700; }
+  .content { flex:1; padding:20px 24px 40px; overflow:auto; background:#fff; }
+  .breadcrumb { font-size:12px; color:#9ca3af; margin-bottom:6px; }
+  .page-title { font-size:18px; font-weight:700; color:#111827; margin-bottom:4px; }
+  .board-name { font-size:14.5px; font-weight:700; color:#374151; margin:14px 0 12px; }
+
+  /* ── 기획 노트 ─────────────────────────── */
+  .plan-note { background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:10px 14px; font-size:12.5px; color:#92400e; margin-bottom:14px; line-height:1.55; }
+  .plan-note b { color:#b45309; }
+  .new-mark { display:inline-block; background:#f97316; color:#fff; font-size:10px; font-weight:700; border-radius:4px; padding:1px 5px; margin-right:6px; vertical-align:2px; }
+  .hl-new { outline:2px dashed #f97316; outline-offset:3px; border-radius:6px; }
+
+  /* ── 검색 영역 ─────────────────────────── */
+  .search-box { border:1px solid #e5e7eb; border-radius:8px; padding:14px 18px; margin-bottom:14px; }
+  .search-row { display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:10px; }
+  .search-row:last-child { margin-bottom:0; }
+  .f-label { font-size:13px; font-weight:700; color:#374151; }
+  .f-label::before { content:"•"; color:#374151; margin-right:4px; }
+  input[type=text] { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:13px; width:200px; }
+  select { border:1px solid #d1d5db; border-radius:6px; padding:6px 8px; font-size:13px; background:#fff; }
+  .seg { display:inline-flex; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; }
+  .seg button { border:none; background:#fff; padding:6px 12px; font-size:12.5px; color:#6b7280; cursor:pointer; border-right:1px solid #e5e7eb; }
+  .seg button:last-child { border-right:none; }
+  .seg button.on { color:#2563eb; font-weight:700; background:#eff6ff; }
+  .btn { border:none; border-radius:6px; padding:8px 18px; font-size:13px; cursor:pointer; }
+  .btn-primary { background:#3b82f6; color:#fff; }
+  .btn-line { background:#fff; border:1px solid #d1d5db; color:#374151; }
+  .btn-dark { background:#374151; color:#fff; }
+  .btn-danger-line { background:#fff; border:1px solid #fca5a5; color:#dc2626; }
+  .btn:disabled { opacity:.45; cursor:default; }
+  .search-submit { display:flex; justify-content:flex-end; }
+
+  /* ── 목록 툴바(B안 신규) ─────────────────────────── */
+  .list-toolbar { display:flex; align-items:center; gap:8px; margin:0 0 10px; padding:10px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; }
+  .sel-count { font-size:13px; color:#334155; margin-right:auto; }
+  .sel-count b { color:#2563eb; }
+
+  /* ── 테이블 ─────────────────────────── */
+  .total { font-size:13px; color:#374151; margin:2px 0 8px; }
+  .total b { color:#2563eb; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  thead th { background:#f9fafb; border-top:2px solid #374151; border-bottom:1px solid #e5e7eb; padding:9px 6px; color:#374151; font-weight:700; white-space:nowrap; }
+  tbody td { border-bottom:1px solid #f1f5f9; padding:8px 6px; text-align:center; color:#374151; white-space:nowrap; }
+  tbody tr:hover { background:#f8fafc; }
+  tbody tr.row-checked { background:#eff6ff; }
+  td.t-title { text-align:left; max-width:330px; overflow:hidden; text-overflow:ellipsis; position:relative; }
+  .title-link { color:#2563eb; cursor:pointer; }
+  .badge-notice { background:#6366f1; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:6px; }
+  .badge-member { background:#22c55e; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:4px; }
+  .pub-y { color:#16a34a; font-weight:700; }
+  .pub-n { color:#9ca3af; font-weight:700; }
+  tbody td .flash { animation:flashBg 1.2s ease; }
+  @keyframes flashBg { 0%{background:#fef08a;} 100%{background:transparent;} }
+
+  /* 제목 마우스오버 내용 미리보기 */
+  .preview-tip { display:none; position:absolute; left:12px; top:100%; z-index:30; width:340px; background:#1f2937; color:#f9fafb; font-size:12px; line-height:1.6; padding:10px 12px; border-radius:8px; white-space:normal; box-shadow:0 8px 20px rgba(0,0,0,.25); }
+  .preview-tip .tip-cap { color:#fbbf24; font-size:11px; margin-bottom:4px; }
+  td.t-title:hover .preview-tip { display:block; }
+
+  /* ── 상세(A안) ─────────────────────────── */
+  .detail-topbar { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .detail-topbar .pos { font-size:12.5px; color:#6b7280; margin-left:auto; }
+  .dtable { width:100%; border-top:2px solid #374151; }
+  .drow { display:flex; border-bottom:1px solid #f1f5f9; min-height:52px; }
+  .dth { width:160px; flex-shrink:0; background:#fafafa; padding:15px 16px; font-size:13px; font-weight:700; color:#374151; }
+  .dtd { flex:1; padding:15px 16px; font-size:13.5px; color:#374151; line-height:1.7; }
+  .dtd.muted { color:#9ca3af; }
+  .drow.split .dtd { display:flex; }
+  .drow.split .half { flex:1; display:flex; }
+  .drow.split .half .dth2 { width:120px; font-size:13px; font-weight:700; color:#374151; }
+  .pub-row { background:#fffdf5; }
+  .pub-toggle { display:flex; align-items:center; gap:10px; }
+  .pub-toggle input { width:18px; height:18px; accent-color:#3b82f6; cursor:pointer; }
+  .pub-toggle label { font-size:14px; font-weight:700; color:#111827; cursor:pointer; }
+  .pub-state { font-size:12.5px; border-radius:12px; padding:2px 10px; }
+  .pub-state.y { background:#dcfce7; color:#15803d; }
+  .pub-state.n { background:#f3f4f6; color:#6b7280; }
+  .pub-desc { font-size:12px; color:#9ca3af; margin-top:6px; }
+  .detail-bottom { display:flex; gap:8px; margin-top:18px; }
+  .detail-bottom .spacer { flex:1; }
+
+  /* ── 안내 화면 ─────────────────────────── */
+  .guide-wrap { padding:36px 48px; }
+  .guide-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:6px; }
+  .guide-sub { font-size:13.5px; color:#6b7280; margin-bottom:24px; line-height:1.6; }
+  .guide-cards { display:flex; gap:20px; }
+  .gcard { flex:1; border:1px solid #e5e7eb; border-radius:12px; padding:22px 24px; cursor:pointer; transition:box-shadow .15s; }
+  .gcard:hover { box-shadow:0 6px 18px rgba(0,0,0,.08); }
+  .gcard .tag { display:inline-block; font-size:12px; font-weight:800; border-radius:6px; padding:3px 10px; margin-bottom:12px; }
+  .gcard.a .tag { background:#ede9fe; color:#6d28d9; }
+  .gcard.b .tag { background:#dbeafe; color:#1d4ed8; }
+  .gcard h3 { font-size:16px; color:#111827; margin-bottom:10px; }
+  .gcard p { font-size:13px; color:#4b5563; line-height:1.7; }
+  .gcard .flow { margin-top:14px; background:#f9fafb; border-radius:8px; padding:10px 14px; font-size:12.5px; color:#374151; line-height:1.9; }
+  .guide-foot { margin-top:24px; font-size:12.5px; color:#9ca3af; line-height:1.7; }
+
+  /* ── 토스트 ─────────────────────────── */
+  #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:#111827; color:#fff; font-size:13.5px; padding:11px 22px; border-radius:24px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:99; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  #toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <button class="nav-btn active" onclick="showScreen('screen-guide')">안내</button>
+  <button class="nav-btn" onclick="showScreen('screen-detail')">A안 · 상세 즉시 공개</button>
+  <button class="nav-btn" onclick="showScreen('screen-list')">B안 · 목록 일괄 처리</button>
+</nav>
+
+<div class="device-frame">
+
+  <!-- ═══════════ 안내 ═══════════ -->
+  <div class="screen active" id="screen-guide">
+    <div class="guide-wrap">
+      <div class="guide-title">게시글 공개/비공개 처리 개선 — 프로토타입</div>
+      <div class="guide-sub">
+        친구들의 캐츠 활용기 게시판의 공개 처리 업무를 화면에서 끝내기 위한 두 방향입니다.
+        두 방향은 택일이 아니라 함께 제공될 수 있으며, 실제 동작을 눌러보며 확인할 수 있습니다.
+      </div>
+      <div class="guide-cards">
+        <div class="gcard a" onclick="showScreen('screen-detail')">
+          <span class="tag">A안</span>
+          <h3>상세에서 바로 공개 처리 + 이전/다음 연속 검수</h3>
+          <p>
+            현재는 상세에서 공개여부가 읽기 전용이라 수정 버튼을 눌러 수정 모드로 들어가야 바꿀 수 있습니다.
+            공개하기 체크박스를 수정 모드 밖으로 꺼내 상세 화면에서 <b>체크 즉시 적용</b>되게 하고,
+            이전 글/다음 글 버튼으로 글을 넘기며 연속으로 검수합니다.
+          </p>
+          <div class="flow">
+            검수 동선: 글 읽기 → 공개하기 체크(즉시 적용) → 다음 글 → 반복
+          </div>
+        </div>
+        <div class="gcard b" onclick="showScreen('screen-list')">
+          <span class="tag">B안</span>
+          <h3>목록 다중 선택 → 일괄 공개/비공개</h3>
+          <p>
+            목록에 체크박스와 전체 선택 · 전체 해제 · <b>선택 반전</b> 버튼을 추가하고,
+            선택한 글을 한 번에 공개/비공개 처리합니다.
+            제목에 마우스를 올리면 내용 미리보기가 떠서 목록에서 바로 검수할 수 있습니다.
+          </p>
+          <div class="flow">
+            검수 동선: 문제 글만 체크 → 선택 반전 → 일괄 공개 → 문제 글만 비공개로 남음
+          </div>
+        </div>
+      </div>
+      <div class="guide-foot">
+        · 일괄 처리 시점에 이미 삭제된 글은 자동 제외되고 결과가 안내됩니다 (B안에서 시연 가능 — 감옥에서 누가돌아왔게~~~ 글이 삭제된 상황을 가정).<br>
+        · 공지글(관리자 작성)은 일괄 처리 대상에서 제외되어 체크박스가 비활성화됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ A안 · 상세 ═══════════ -->
+  <div class="screen" id="screen-detail">
+    <div class="gnb">
+      <div class="logo"><span class="dot"></span> 통합관리자</div>
+      <a>회원관리</a><a>학원/클래스</a><a class="on">서비스운영</a><a>교사업무관리</a><a>교사업무현황조회</a><a>시스템</a>
+      <span class="right">고진미 · 관리자센터 이동</span>
+    </div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="profile"><span class="avatar">👤</span> 고진미</div>
+        <span class="menu on">게시판 목록</span>
+        <span class="menu">사용자저작</span>
+        <span class="menu">교재</span>
+        <span class="menu">기준정보관리</span>
+        <span class="menu">데이터 다운로드</span>
+      </aside>
+      <main class="content">
+        <div class="breadcrumb">🏠 › 서비스운영 › 게시판관리 › 게시글 상세</div>
+        <div class="page-title">게시글 상세 — 친구들의 캐츠 활용기</div>
+
+        <div class="plan-note">
+          <b>A안 변경 지점</b> — ① 공개여부를 수정 모드 밖으로 꺼내 상세에서 <b>체크 즉시 적용</b>
+          ② 이전 글/다음 글 버튼으로 목록에 돌아가지 않고 연속 검수. 주황 점선이 변경 부분입니다.
+        </div>
+
+        <div class="detail-topbar">
+          <button class="btn btn-line" onclick="showScreen('screen-list')">← 목록</button>
+          <span class="hl-new" style="display:inline-flex; gap:6px; padding:2px;">
+            <button class="btn btn-line" id="btnPrev" onclick="movePost(-1)">〈 이전 글</button>
+            <button class="btn btn-line" id="btnNext" onclick="movePost(1)">다음 글 〉</button>
+          </span>
+          <span class="pos" id="detailPos"></span>
+        </div>
+
+        <div class="dtable">
+          <div class="drow"><div class="dth">제목</div><div class="dtd" id="dTitle"></div></div>
+          <div class="drow split">
+            <div class="dtd" style="padding:0;">
+              <div class="half"><div class="dth">작성자</div><div class="dtd" id="dAuthor"></div></div>
+              <div class="half"><div class="dth dth2" style="padding:15px 16px;">등록일시</div><div class="dtd" id="dDate"></div></div>
+            </div>
+          </div>
+          <div class="drow"><div class="dth">내용</div><div class="dtd" id="dContent" style="min-height:120px;"></div></div>
+          <div class="drow"><div class="dth">파일 첨부</div><div class="dtd muted">—</div></div>
+          <div class="drow"><div class="dth">썸네일</div><div class="dtd muted">미사용</div></div>
+          <div class="drow split">
+            <div class="dtd" style="padding:0;">
+              <div class="half"><div class="dth">해시태그</div><div class="dtd" id="dTag"></div></div>
+              <div class="half"><div class="dth dth2" style="padding:15px 16px;">게시기간</div><div class="dtd muted">미사용</div></div>
+            </div>
+          </div>
+          <div class="drow split">
+            <div class="dtd" style="padding:0;">
+              <div class="half"><div class="dth">공지글</div><div class="dtd">N</div></div>
+              <div class="half"><div class="dth dth2" style="padding:15px 16px;">추천</div><div class="dtd muted">—</div></div>
+            </div>
+          </div>
+          <div class="drow"><div class="dth">노출순서</div><div class="dtd muted">미사용</div></div>
+          <div class="drow"><div class="dth">댓글(대댓글)</div><div class="dtd muted">💬 댓글 0</div></div>
+          <div class="drow pub-row hl-new">
+            <div class="dth"><span class="new-mark">변경</span>공개여부</div>
+            <div class="dtd">
+              <div class="pub-toggle">
+                <input type="checkbox" id="dPubChk" onchange="togglePublic(this)">
+                <label for="dPubChk">공개하기</label>
+                <span class="pub-state n" id="dPubState">비공개</span>
+              </div>
+              <div class="pub-desc">체크/해제 즉시 반영됩니다. 수정 모드 진입 없이 상세에서 바로 공개 처리.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-bottom">
+          <button class="btn btn-line" onclick="showScreen('screen-list')">목록</button>
+          <span class="spacer"></span>
+          <button class="btn btn-primary">수정</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ═══════════ B안 · 목록 ═══════════ -->
+  <div class="screen" id="screen-list">
+    <div class="gnb">
+      <div class="logo"><span class="dot"></span> 통합관리자</div>
+      <a>회원관리</a><a>학원/클래스</a><a class="on">서비스운영</a><a>교사업무관리</a><a>교사업무현황조회</a><a>시스템</a>
+      <span class="right">고진미 · 관리자센터 이동</span>
+    </div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="profile"><span class="avatar">👤</span> 고진미</div>
+        <span class="menu on">게시판 목록</span>
+        <span class="menu">사용자저작</span>
+        <span class="menu">교재</span>
+        <span class="menu">기준정보관리</span>
+        <span class="menu">데이터 다운로드</span>
+      </aside>
+      <main class="content">
+        <div class="breadcrumb">🏠 › 서비스운영 › 게시판관리</div>
+        <div class="page-title">게시판관리</div>
+        <div class="board-name">친구들의 캐츠 활용기</div>
+
+        <div class="plan-note">
+          <b>B안 변경 지점</b> — ① 목록 체크박스 + 전체 선택 · 전체 해제 · <b>선택 반전</b>
+          ② 선택 글 일괄 공개/비공개(즉시 반영, 삭제된 글 자동 제외) ③ 제목 마우스오버 시 내용 미리보기.
+          공지글은 체크 불가. <b>시연:</b> 문제 글 2~3개만 체크 → 선택 반전 → 선택 공개.
+        </div>
+
+        <div class="search-box">
+          <div class="search-row">
+            <span class="f-label">제목</span><input type="text">
+            <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 공지글만 검색</label>
+            <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 추천만 검색</label>
+            <span class="f-label">회원구분</span><select><option>전체</option></select>
+          </div>
+          <div class="search-row">
+            <span class="f-label">카테고리</span><select><option>전체</option></select><select><option>전체</option></select>
+            <span class="f-label">답변여부</span>
+            <span class="seg"><button class="on">전체</button><button>답변완료</button><button>미처리</button></span>
+            <span class="f-label">공개여부</span>
+            <span class="seg"><button class="on">전체</button><button>공개</button><button>미공개</button></span>
+          </div>
+          <div class="search-submit"><button class="btn btn-primary">검색</button></div>
+        </div>
+
+        <div class="total">• 총 <b id="totalCnt">20188</b>개</div>
+
+        <div class="list-toolbar hl-new">
+          <span class="new-mark">변경</span>
+          <span class="sel-count">선택 <b id="selCount">0</b>건</span>
+          <button class="btn btn-line" onclick="selAll(true)">전체 선택</button>
+          <button class="btn btn-line" onclick="selAll(false)">전체 해제</button>
+          <button class="btn btn-dark" onclick="selInvert()">선택 반전</button>
+          <span style="width:1px; height:22px; background:#d1d5db; margin:0 4px;"></span>
+          <button class="btn btn-primary" id="btnPubY" onclick="bulkSet(true)" disabled>선택 공개</button>
+          <button class="btn btn-danger-line" id="btnPubN" onclick="bulkSet(false)" disabled>선택 비공개</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;"><input type="checkbox" id="chkHead" onchange="selAll(this.checked)"></th>
+              <th style="width:56px;">순번</th>
+              <th style="text-align:left;">제목</th>
+              <th style="width:60px;">조회수</th>
+              <th style="width:64px;">답변여부</th>
+              <th style="width:56px;">공지글</th>
+              <th style="width:120px;">작성자</th>
+              <th style="width:130px;">등록일시</th>
+              <th style="width:130px;">수정일시</th>
+              <th style="width:48px;">공개</th>
+            </tr>
+          </thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </main>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ── 화면 전환 ── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[onclick="showScreen('${id}')"].nav-btn`)?.classList.add('active');
+}
+
+/* ── 토스트 ── */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ── 더미 데이터 (실제 목록 화면 기준) ── */
+const rows = [
+  { no:20188, title:'캐츠 하다가 영어 유튜버 꿈까지 생김ㅋㅎㅋ', views:2505, notice:true,  author:'정*민(1572727)', reg:'2026.08.03 12:29', mod:'2026.08.04 10:05', pub:true,
+    content:'캐츠로 매일 영어 하다 보니까 발음이 좋아져서 유튜브도 해보고 싶어졌어요! 다들 캐츠 하세요~' },
+  { no:20187, title:'나만 아는 공부tip--을 알려준다고?!?!~~레전드!!!!!!~~', views:1833, notice:true, author:'조*윤(1488052)', reg:'2026.08.03 11:08', mod:'2026.08.04 09:33', pub:true,
+    content:'공부 팁 공유! 아침에 20분씩 캐츠 하고 등교하면 하루가 다르다!!' },
+  { no:20186, title:'캐잉을 하며 열린 나의 새로운 문', views:3144, notice:true, author:'강*슬(1449732)', reg:'2026.07.29 22:17', mod:'2026.07.30 19:23', pub:true,
+    content:'캐잉을 시작하고 영어책 읽기가 재밌어졌어요. 새로운 문이 열린 기분!' },
+  { no:20185, title:'BFY', views:1, notice:false, author:'정*비(1545333)', reg:'2026.08.06 15:57', mod:'2026.08.06 15:57', pub:false,
+    content:'BFY BFY BFY' },
+  { no:20184, title:'캐츠', views:4, notice:false, author:'신*비(1187208)', reg:'2026.08.06 15:57', mod:'2026.08.06 15:57', pub:false,
+    content:'캐츠 진짜 재밌어요! 아직 안 해본 친구들은 꼭~ 해보는 거야. 알겠지??? 그럼 캐츠 하러 go go!!' },
+  { no:20183, title:'역시 캐츠 !', views:1, notice:false, author:'김*하(1246900)', reg:'2026.08.06 15:56', mod:'2026.08.06 15:56', pub:false,
+    content:'역시 캐츠! 오늘도 미션 다 깼다~' },
+  { no:20182, title:'감옥에서 누가돌아왔게~~~', views:1, notice:false, author:'이*원(1231302)', reg:'2026.08.06 15:55', mod:'2026.08.06 15:55', pub:false, deleted:true,
+    content:'(삭제 시연용 글 — 검수 중 학생이 삭제한 상황을 가정. 일괄 처리 시 자동 제외됩니다.)' },
+  { no:20181, title:'캐츠[이거 짧아서 1000명이 바주면 인터뷰 시리즈 10편까지 생긴다.', views:1, notice:false, author:'심*모(1091775)', reg:'2026.08.06 15:55', mod:'2026.08.06 15:55', pub:false,
+    content:'이 글이 짧아서 1000명이 봐주면 인터뷰 시리즈 10편까지 만들 거예요!' },
+  { no:20180, title:'궁금한거다물어본다~!', views:1, notice:false, author:'이*수(1536058)', reg:'2026.08.06 15:53', mod:'2026.08.06 15:53', pub:false,
+    content:'캐츠에 대해 궁금한 거 다 물어봐~ 내가 다 알려줄게!' },
+  { no:20179, title:'문제(1)정답', views:0, notice:false, author:'선*람(1214022)', reg:'2026.08.06 15:51', mod:'2026.08.06 15:51', pub:false,
+    content:'오늘 문제 정답은 3번! 다들 맞혔지?' },
+];
+const checked = new Set();
+
+/* ── B안: 목록 렌더 ── */
+function renderList() {
+  const tb = document.getElementById('listBody');
+  tb.innerHTML = rows.map((r, i) => {
+    const chk = r.notice
+      ? '<input type="checkbox" disabled title="공지글은 일괄 처리 대상이 아닙니다">'
+      : `<input type="checkbox" ${checked.has(i) ? 'checked' : ''} onchange="rowChk(${i}, this.checked)">`;
+    const noticeBadge = r.notice ? '<span class="badge-notice">공지</span>' : '';
+    return `<tr class="${checked.has(i) ? 'row-checked' : ''}" id="row-${i}">
+      <td>${chk}</td>
+      <td>${r.no}</td>
+      <td class="t-title">${noticeBadge}<span class="title-link" onclick="openDetail(${i})">${r.title}</span>
+        <div class="preview-tip"><div class="tip-cap">내용 미리보기</div>${r.content}</div>
+      </td>
+      <td>${r.views}</td>
+      <td>N</td>
+      <td>${r.notice ? '공지' : '-'}</td>
+      <td><span class="badge-member">회원</span>${r.author}</td>
+      <td>${r.reg}</td>
+      <td>${r.mod}</td>
+      <td id="pub-${i}"><span class="${r.pub ? 'pub-y' : 'pub-n'}">${r.pub ? 'Y' : 'N'}</span></td>
+    </tr>`;
+  }).join('');
+  updateToolbar();
+}
+function rowChk(i, on) { on ? checked.add(i) : checked.delete(i); renderList(); }
+function selAll(on) {
+  checked.clear();
+  if (on) rows.forEach((r, i) => { if (!r.notice) checked.add(i); });
+  document.getElementById('chkHead').checked = on;
+  renderList();
+}
+function selInvert() {
+  rows.forEach((r, i) => {
+    if (r.notice) return;
+    checked.has(i) ? checked.delete(i) : checked.add(i);
+  });
+  renderList();
+  toast('선택을 반전했습니다.');
+}
+function updateToolbar() {
+  document.getElementById('selCount').textContent = checked.size;
+  document.getElementById('btnPubY').disabled = checked.size === 0;
+  document.getElementById('btnPubN').disabled = checked.size === 0;
+}
+function bulkSet(pub) {
+  const targets = [...checked];
+  let done = 0, skipped = 0;
+  targets.forEach(i => {
+    if (rows[i].deleted) { skipped++; checked.delete(i); return; }
+    rows[i].pub = pub;
+    done++;
+  });
+  // 삭제 시연 글은 목록에서도 제거
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (rows[i].deleted && targets.includes(i)) {
+      rows.splice(i, 1);
+      const re = new Set();
+      checked.forEach(c => re.add(c > i ? c - 1 : c));
+      checked.clear(); re.forEach(c => checked.add(c));
+    }
+  }
+  checked.clear();
+  renderList();
+  const word = pub ? '공개' : '비공개';
+  toast(skipped
+    ? `${targets.length}건 중 ${done}건 ${word} 처리 완료 · ${skipped}건은 삭제된 글이라 제외되었습니다.`
+    : `${done}건 ${word} 처리가 완료되었습니다.`);
+}
+
+/* ── A안: 상세 ── */
+let cur = 3; // BFY부터 시작 (비공개 검수 대상)
+function renderDetail() {
+  const p = rows[cur];
+  document.getElementById('dTitle').textContent = p.title;
+  document.getElementById('dAuthor').innerHTML = `<span class="badge-member">회원</span>${p.author}`;
+  document.getElementById('dDate').textContent = p.reg + ' · 조회 ' + p.views;
+  document.getElementById('dContent').textContent = p.content;
+  document.getElementById('dTag').textContent = 'char_5';
+  document.getElementById('dPubChk').checked = p.pub;
+  setPubState(p.pub);
+  document.getElementById('detailPos').textContent = `${cur + 1} / ${rows.length}번째 글 (게시글 번호 ${p.no})`;
+  document.getElementById('btnPrev').disabled = cur === 0;
+  document.getElementById('btnNext').disabled = cur === rows.length - 1;
+}
+function setPubState(pub) {
+  const s = document.getElementById('dPubState');
+  s.textContent = pub ? '공개' : '비공개';
+  s.className = 'pub-state ' + (pub ? 'y' : 'n');
+}
+function movePost(d) {
+  cur = Math.min(rows.length - 1, Math.max(0, cur + d));
+  renderDetail();
+}
+function togglePublic(chk) {
+  rows[cur].pub = chk.checked;
+  setPubState(chk.checked);
+  toast(chk.checked ? '공개 처리되었습니다. (즉시 적용)' : '비공개 처리되었습니다. (즉시 적용)');
+}
+function openDetail(i) { cur = i; renderDetail(); showScreen('screen-detail'); }
+
+renderList();
+renderDetail();
+</script>
+</body>
+</html>
