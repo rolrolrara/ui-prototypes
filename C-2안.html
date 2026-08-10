@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게시판관리 — 오버레이 내용 미리보기 (C-2안) — CATS-20527</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background:#f0f2f5; font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+  .frame { width:1500px; min-height:100vh; margin:0 auto; background:#fff; box-shadow:0 0 24px rgba(0,0,0,.08); display:flex; flex-direction:column; }
+
+  /* ── CAS 공통 레이아웃 ─────────────────────────── */
+  .gnb { display:flex; align-items:center; gap:28px; padding:0 24px; height:52px; border-bottom:1px solid #e5e7eb; background:#fff; flex-shrink:0; }
+  .gnb .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:#111827; }
+  .gnb .logo .dot { width:18px; height:18px; border-radius:50%; background:conic-gradient(#f59e0b,#ef4444,#6366f1,#22c55e,#f59e0b); }
+  .gnb a { font-size:14px; color:#374151; text-decoration:none; padding:15px 2px; }
+  .gnb a.on { color:#2563eb; font-weight:700; border-bottom:2px solid #2563eb; }
+  .gnb .right { margin-left:auto; font-size:13px; color:#6b7280; }
+  .layout { display:flex; flex:1; min-height:0; }
+  .sidebar { width:180px; background:#1f2937; color:#cbd5e1; flex-shrink:0; padding-top:12px; }
+  .sidebar .profile { display:flex; align-items:center; gap:8px; padding:14px 16px 18px; font-size:14px; color:#e5e7eb; }
+  .sidebar .avatar { width:28px; height:28px; border-radius:50%; background:#64748b; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .sidebar .menu { display:block; padding:11px 16px; font-size:13.5px; cursor:pointer; }
+  .sidebar .menu.on { background:#111827; color:#fff; font-weight:700; }
+  .content { flex:1; padding:20px 24px 40px; overflow:auto; background:#fff; }
+  .breadcrumb { font-size:12px; color:#9ca3af; margin-bottom:6px; }
+  .page-title { font-size:18px; font-weight:700; color:#111827; margin-bottom:4px; }
+  .board-name { font-size:14.5px; font-weight:700; color:#374151; margin:14px 0 12px; }
+
+  /* ── 검색 영역 ─────────────────────────── */
+  .search-box { border:1px solid #e5e7eb; border-radius:8px; padding:14px 18px; margin-bottom:14px; }
+  .search-row { display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:10px; }
+  .search-row:last-child { margin-bottom:0; }
+  .f-label { font-size:13px; font-weight:700; color:#374151; }
+  .f-label::before { content:"•"; color:#374151; margin-right:4px; }
+  input[type=text] { border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:13px; width:200px; }
+  select { border:1px solid #d1d5db; border-radius:6px; padding:6px 8px; font-size:13px; background:#fff; }
+  .seg { display:inline-flex; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; }
+  .seg button { border:none; background:#fff; padding:6px 12px; font-size:12.5px; color:#6b7280; cursor:pointer; border-right:1px solid #e5e7eb; }
+  .seg button:last-child { border-right:none; }
+  .seg button.on { color:#2563eb; font-weight:700; background:#eff6ff; }
+  .btn { border:none; border-radius:6px; padding:8px 18px; font-size:13px; cursor:pointer; }
+  .btn-primary { background:#3b82f6; color:#fff; }
+  .btn-line { background:#fff; border:1px solid #d1d5db; color:#374151; }
+  .btn:disabled { opacity:.45; cursor:default; }
+
+  /* ── 총 N개 + 선택 처리 한 줄 ─────────────────────────── */
+  .total-row { display:flex; align-items:center; margin:2px 0 10px; }
+  .total { font-size:13px; color:#374151; }
+  .total b { color:#2563eb; }
+  .tr-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .c-label { font-size:13px; color:#374151; font-weight:600; }
+
+  /* ── 테이블 (실화면 전체 컬럼) ─────────────────────────── */
+  .table-zone { position:relative; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  thead th { background:#f9fafb; border-top:2px solid #374151; border-bottom:1px solid #e5e7eb; padding:9px 4px; color:#374151; font-weight:700; white-space:nowrap; }
+  tbody td { border-bottom:1px solid #f1f5f9; padding:9px 4px; text-align:center; color:#374151; white-space:nowrap; }
+  tbody tr { cursor:pointer; }
+  tbody tr:hover { background:#f8fafc; }
+  tbody tr.row-checked { background:#eff6ff; }
+  tbody tr.row-pinned { background:#fef9c3; }
+  tbody tr.row-pinned:hover { background:#fef9c3; }
+  td.t-title { text-align:left; max-width:330px; overflow:hidden; text-overflow:ellipsis; }
+  .title-link { color:#2563eb; }
+  .badge-notice { background:#6366f1; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:6px; }
+  .badge-member { background:#22c55e; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:4px; }
+  .badge-admin { background:#f59e0b; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:4px; }
+  .pub-y { color:#16a34a; font-weight:700; }
+  .pub-n { color:#9ca3af; font-weight:700; }
+
+  /* ── 오버레이 내용 미리보기 카드 ─────────────────────────── */
+  .overlay-card { position:absolute; top:0; right:0; width:340px; max-height:540px; background:#fff; border:1px solid #d1d5db; border-radius:12px; box-shadow:0 14px 36px rgba(0,0,0,.20); display:none; flex-direction:column; overflow:hidden; z-index:20; }
+  .overlay-card.show { display:flex; }
+  .pv-head { display:flex; align-items:center; gap:8px; padding:10px 14px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:13px; font-weight:700; color:#374151; }
+  .pv-pin { font-size:11.5px; font-weight:600; color:#b45309; background:#fef3c7; border-radius:10px; padding:2px 9px; display:none; cursor:pointer; }
+  .pv-pin.show { display:inline-block; }
+  .pv-close { margin-left:auto; border:none; background:none; font-size:14px; color:#9ca3af; cursor:pointer; padding:2px 4px; }
+  .pv-body { padding:14px 16px; overflow-y:auto; flex:1; }
+  .pv-body::-webkit-scrollbar { width:8px; }
+  .pv-body::-webkit-scrollbar-track { background:#f3f4f6; border-radius:4px; }
+  .pv-body::-webkit-scrollbar-thumb { background:#c7ccd4; border-radius:4px; }
+  .pv-body::-webkit-scrollbar-thumb:hover { background:#9ca3af; }
+  .pv-title { font-size:14px; font-weight:700; color:#111827; line-height:1.5; margin-bottom:8px; }
+  .pv-meta { font-size:12px; color:#6b7280; line-height:1.7; padding-bottom:10px; border-bottom:1px solid #f1f5f9; margin-bottom:12px; }
+  .pv-meta .pv-pub-y { color:#16a34a; font-weight:700; }
+  .pv-meta .pv-pub-n { color:#9ca3af; font-weight:700; }
+  .pv-content { font-size:13px; color:#374151; line-height:1.8; white-space:pre-line; word-break:break-all; }
+  .pv-foot { padding:9px 14px; border-top:1px solid #f1f5f9; font-size:11.5px; color:#9ca3af; line-height:1.6; background:#fafafa; }
+
+  /* ── 페이징 ─────────────────────────── */
+  .pager { display:flex; align-items:center; justify-content:center; gap:6px; margin:16px 0 4px; font-size:12.5px; color:#6b7280; }
+  .pager .pg { min-width:26px; height:26px; border:1px solid #e5e7eb; border-radius:5px; background:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+  .pager .pg.on { border-color:#3b82f6; color:#2563eb; font-weight:700; }
+  .pager select, .pager input { border:1px solid #d1d5db; border-radius:5px; padding:4px 6px; font-size:12px; }
+  .pager input { width:44px; text-align:center; }
+
+  /* ── 토스트 ─────────────────────────── */
+  #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:#111827; color:#fff; font-size:13.5px; padding:11px 22px; border-radius:24px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:99; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  #toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="gnb">
+    <div class="logo"><span class="dot"></span> 통합관리자</div>
+    <a>회원관리</a><a>학원/클래스</a><a class="on">서비스운영</a><a>교사업무관리</a><a>교사업무현황조회</a><a>주문관리</a><a>시스템</a>
+    <span class="right">☁️ 캣톡 · 관리자센터 이동</span>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="profile"><span class="avatar">👤</span> 고진미</div>
+      <span class="menu on">게시판 목록</span>
+      <span class="menu">사용자저작</span>
+      <span class="menu">교재</span>
+      <span class="menu">기준정보관리</span>
+      <span class="menu">엑셀 다운 관리</span>
+      <span class="menu">개인정보 인출 관리</span>
+      <span class="menu">프로모션관리 A타입</span>
+      <span class="menu">프로모션관리 B타입</span>
+      <span class="menu">프로모션관리 C타입</span>
+      <span class="menu">데이터 다운로드</span>
+      <span class="menu">포인트 업로드</span>
+      <span class="menu">시스템 자동문자/알림톡 템플릿관리</span>
+      <span class="menu">이벤트 배너</span>
+    </aside>
+    <main class="content">
+      <div class="breadcrumb">게시판관리 &nbsp; 🏠 › 서비스운영 › 게시판관리</div>
+      <div class="board-name">친구들의 캐츠 활용기</div>
+
+      <div class="search-box">
+        <div class="search-row">
+          <span class="f-label">검색어</span>
+          <select><option>작성자(회원번호)</option><option>제목</option></select>
+          <input type="text">
+          <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 공지글만 검색</label>
+          <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 추천만 검색</label>
+          <span class="f-label">회원구분</span><select><option>전체</option></select>
+        </div>
+        <div class="search-row">
+          <span class="f-label">카테고리</span><select><option>전체</option></select><select><option>전체</option></select>
+          <span class="f-label">답변여부</span>
+          <span class="seg"><button class="on">전체</button><button>답변완료</button><button>미처리</button></span>
+          <span class="f-label">공개여부</span>
+          <span class="seg"><button class="on">전체</button><button>공개</button><button>미공개</button></span>
+        </div>
+        <div class="search-row" style="margin-bottom:0;">
+          <span class="f-label">기간</span>
+          <select><option>등록일</option><option>수정일</option></select>
+          <input type="text" value="2026.08.01 ~ 2026.08.10" style="width:190px;"> <span style="font-size:14px;">📅</span>
+          <span style="margin-left:auto;"><button class="btn btn-primary">검색</button></span>
+        </div>
+      </div>
+
+      <div class="total-row">
+        <span class="total">• 총 <b>22853</b>개</span>
+        <button class="btn btn-line" style="margin-left:10px;" onclick="toast('검색 조건(기간 포함) 기준으로 엑셀 다운로드됩니다.')">엑셀 다운로드</button>
+        <span class="tr-right">
+          <span style="width:1px; height:22px; background:#d1d5db;"></span>
+          <span class="c-label">✓ 선택한 회원에 대해</span>
+          <button class="btn btn-primary" id="btnPubY" onclick="bulkSet(true)" disabled>선택 공개</button>
+          <button class="btn btn-primary" style="background:#2563eb;" id="btnPubN" onclick="bulkSet(false)" disabled>선택 비공개</button>
+        </span>
+      </div>
+
+      <div class="table-zone" id="tableZone">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px;"><input type="checkbox" id="chkHead" onchange="selAll(this.checked)"></th>
+              <th style="width:52px;">순번</th>
+              <th style="width:70px;">카테고리</th>
+              <th style="text-align:left;">제목</th>
+              <th style="width:55px;">조회수</th>
+              <th style="width:60px;">답변여부</th>
+              <th style="width:50px;">공지글</th>
+              <th style="width:120px;">작성자</th>
+              <th style="width:110px;">최근 수정자</th>
+              <th style="width:135px;">등록일시</th>
+              <th style="width:135px;">수정일시</th>
+              <th style="width:40px;">공개</th>
+            </tr>
+          </thead>
+          <tbody id="listBody"></tbody>
+        </table>
+
+        <!-- 오버레이 내용 미리보기 카드: 평소엔 숨김, 행 오버 시 표 위에 얹힘 -->
+        <aside class="overlay-card" id="pvCard">
+          <div class="pv-head">
+            내용 미리보기
+            <span class="pv-pin" id="pvPin" onclick="unpin()">📌 고정됨 · 해제</span>
+            <button class="pv-close" onclick="closeCard()">✕</button>
+          </div>
+          <div class="pv-body" id="pvBody"></div>
+          <div class="pv-foot">마우스 오버 = 미리보기 · 행 클릭 = 고정/해제</div>
+        </aside>
+
+        <div class="pager">
+          <span class="pg">‹</span>
+          <span class="pg on">1</span><span class="pg">2</span><span class="pg">3</span><span class="pg">4</span><span class="pg">5</span>
+          <span class="pg">6</span><span class="pg">7</span><span class="pg">8</span><span class="pg">9</span><span class="pg">10</span>
+          <span class="pg">›</span>
+          <select><option>10개 보기</option></select>
+          <input type="text" value="1"> 페이지 이동
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* 실화면(2026.08.10) 기준 데이터 — 전체 필드 유지 */
+const rows = [
+  { no:22853, title:'(2편) 캐츠로 공부하는 나', notice:true, views:1947, ans:'N', author:'김***루(1083541)', modBy:'김******(10960)', reg:'2026.08.06 10:05:20', upd:'2026.08.07 18:55:40', pub:true,
+    content:'1편에 이어서 캐츠로 공부하는 제 하루를 소개할게요!\n\n아침에 일어나면 제일 먼저 캐츠 미션부터 확인해요. 등교 전에 발음 연습 10분, 하교 후에 독해 2개, 자기 전에 단어 복습까지가 저의 루틴이에요.\n\n이렇게 한 지 3개월 됐는데 영어가 진짜 편해졌어요. 다들 2편도 읽어줘서 고마워요!' },
+  { no:22852, title:'저의 비밀을 폭로합니다..🤪', notice:true, views:3002, ans:'N', author:'장*린(1442180)', modBy:'김******(10960)', reg:'2026.08.05 21:51:06', upd:'2026.08.06 17:30:56', pub:true,
+    content:'사실 저는... 작년까지 영어를 제일 싫어했습니다!!\n\n시험만 보면 60점, 단어는 외워도 다음 날이면 까먹고, 영어 시간엔 딴생각만 했어요. 학원도 다녀봤지만 재미가 없어서 맨날 졸기만 했고요.\n\n그런데 캐츠를 시작하고 나서 조금씩 달라졌어요. 캐릭터가 응원해 주니까 하루 미션은 꼭 하게 되고, 발음 점수 올리는 재미로 매일 소리 내서 읽었어요.\n\n제가 했던 방법을 자세히 공개할게요!\n\n1. 아침 등교 전 15분 — 발음 연습\n일어나자마자 발음 미션 하나를 꼭 해요. 처음엔 60점대였는데 매일 하니까 90점대가 나와요. 입이 풀려서 학교 영어 수업 때도 자신 있게 읽게 됐어요.\n\n2. 하교 후 30분 — 독해 + 단어\n독해 지문 2개를 풀고, 모르는 단어는 바로 단어장에 정리해요. 단어장은 자기 전에 한 번 더 봐요. 이게 제일 중요해요!\n\n3. 주말 — 밀린 미션 몰아서 하지 않기\n예전엔 주말에 몰아서 했는데 그러면 하나도 기억에 안 남아요. 주말에도 딱 30분씩만, 대신 매일 하는 게 비법이에요.\n\n4. 캐릭터 보상 모으기\n미션 완료하면 받는 보상으로 캐릭터 꾸미는 재미가 쏠쏠해요. 이거 모으려고 시작했다가 공부 습관이 잡힌 케이스가 바로 저예요ㅋㅋ\n\n5. 게시판에 인증글 쓰기\n이 게시판에 일주일에 한 번씩 공부 인증글을 올렸어요. 친구들이 댓글로 응원해 주니까 더 열심히 하게 되더라고요.\n\n그리고 이번 학기 중간고사에서... 무려 92점을 받았습니다!!! 🎉\n\n60점에서 92점까지, 딱 6개월 걸렸어요. 영어가 싫었던 제가 이렇게 됐으니 여러분도 무조건 할 수 있어요.\n\n이게 저의 비밀 폭로였습니다ㅋㅋ 다들 캐츠 하세요~~ 궁금한 거 있으면 댓글 남겨 주세요! 다 알려드릴게요😊' },
+  { no:22851, title:'캐츠로 성적 UP! Up! 희망을 느껴봐!!!', notice:true, views:1430, ans:'N', author:'김*아(1487392)', modBy:'김******(10960)', reg:'2026.08.05 21:13:24', upd:'2026.08.06 17:19:06', pub:true,
+    content:'캐츠 시작 전 영어 점수 71점 → 지금 95점!\n\n비결은 딱 하나, 매일 꾸준히 하는 거예요. 하루 30분씩 캐츠랑 공부하면 진짜 성적이 올라요. 희망을 느껴봐!!!' },
+  { no:22850, title:'정*빈님~', notice:false, views:1, ans:'N', author:'윤*준(1121706)', modBy:null, reg:'2026.08.10 15:23:17', upd:'2026.08.10 15:23:17', pub:false,
+    content:'정*빈님~ 어제 올리신 글 잘 봤어요! 저도 그 초성게임 해봤는데 진짜 재밌더라고요. 다음 편도 기다릴게요~' },
+  { no:22849, title:'다른 분들이 재밋는 이야기 쓰씨길래 써봅니당', notice:false, views:0, ans:'N', author:'이*린(1268362)', modBy:null, reg:'2026.08.10 15:22:43', upd:'2026.08.10 15:22:43', pub:false,
+    content:'다른 분들이 재밌는 이야기 쓰시길래 저도 하나 써봅니당ㅎㅎ\n\n오늘 캐츠 하다가 발음 점수 100점 나왔어요! 처음이라 너무 신나서 소리 질렀더니 엄마가 놀라셨어요ㅋㅋㅋ' },
+  { no:22848, title:'제가 썰 엄마 몰래 풀어볼게요', notice:false, views:1, ans:'N', author:'이*빈(1302557)', modBy:null, reg:'2026.08.10 15:20:45', upd:'2026.08.10 15:20:45', pub:false,
+    content:'엄마 몰래 쓰는 썰입니다ㅋㅋ\n\n사실 엄마가 캐츠 하라고 할 때마다 하기 싫은 척했는데, 진짜로는 재밌어서 몰래 미션 2배로 하고 있어요. 엄마한테는 비밀이에요!!' },
+  { no:22847, title:'애들아 안녕! ,&lt;1편&gt; (2편은 내일!)', notice:false, views:1, ans:'N', author:'이*아(1236069)', modBy:null, reg:'2026.08.10 15:20:07', upd:'2026.08.10 15:20:07', pub:false,
+    content:'애들아 안녕! 오늘부터 내 캐츠 이야기 시리즈 시작할게!\n\n1편은 내가 캐츠를 처음 만난 날 이야기야. 작년 겨울에 엄마가 이거 해보라고 해서 시작했는데... (2편은 내일!)' },
+  { no:22846, title:'재미있고 이유까지 알려주는 초성게임!!😍❤️🐾(공부) 총4문제!!', notice:false, views:1, ans:'N', author:'조*윤(1488052)', modBy:null, reg:'2026.08.10 15:14:37', upd:'2026.08.10 15:14:37', pub:false,
+    content:'재미있고 이유까지 알려주는 초성게임!! 총 4문제!\n\n1번: ㅋㅊ (힌트: 우리가 매일 하는 것!)\n2번: ㅂㅇ (힌트: 영어 공부할 때 제일 중요한 것!)\n3번: ㄷㅇ (힌트: 매일 외우는 것!)\n4번: ㅁㅅ (힌트: 하루에 꼭 해야 하는 것!)\n\n정답은 댓글로 달아줘~ 다 맞히면 인정!!' },
+  { no:22845, title:'여러분은 시험 볼 때 몇점 맡나요?', notice:false, views:1, ans:'N', author:'이*린(1268362)', modBy:null, reg:'2026.08.10 15:12:34', upd:'2026.08.10 15:12:34', pub:false,
+    content:'여러분은 영어 시험 볼 때 몇 점 맞나요?\n\n저는 캐츠 시작하고 나서 85점까지 올랐어요! 다들 몇 점인지 궁금해요~ 댓글로 알려주세요!' },
+  { no:22844, title:'정*랑 님께 답변요', notice:false, views:1, ans:'N', author:'유*우(1089089)', modBy:null, reg:'2026.08.10 15:12:16', upd:'2026.08.10 15:12:16', pub:false,
+    content:'정*랑 님이 물어보신 거 답변드려요!\n\n힌트는 하루에 3개까지만 쓸 수 있고, 다 쓰면 다음 날 다시 채워져요. 저도 처음에 몰라서 헤맸어요ㅎㅎ' },
+];
+const checked = new Set();
+let pinned = null;
+
+function renderList() {
+  const tb = document.getElementById('listBody');
+  tb.innerHTML = rows.map((r, i) => {
+    const noticeBadge = r.notice ? '<span class="badge-notice">공지</span>' : '';
+    const author = `<span class="badge-member">회원</span>${r.author}`;
+    const modBy = r.modBy ? `<span class="badge-admin">관리자</span>${r.modBy}` : '-';
+    const cls = [checked.has(i) ? 'row-checked' : '', pinned === i ? 'row-pinned' : ''].join(' ');
+    return `<tr class="${cls}" onmouseenter="hoverRow(${i})" onclick="togglePin(${i})">
+      <td onclick="event.stopPropagation()"><input type="checkbox" ${checked.has(i) ? 'checked' : ''} onchange="rowChk(${i}, this.checked)"></td>
+      <td>${r.no}</td>
+      <td>-</td>
+      <td class="t-title">${noticeBadge}<span class="title-link">${r.title}</span></td>
+      <td>${r.views}</td>
+      <td>${r.ans}</td>
+      <td>${r.notice ? '공지' : '-'}</td>
+      <td>${author}</td>
+      <td>${modBy}</td>
+      <td>${r.reg}</td>
+      <td>${r.upd}</td>
+      <td><span class="${r.pub ? 'pub-y' : 'pub-n'}">${r.pub ? 'Y' : 'N'}</span></td>
+    </tr>`;
+  }).join('');
+  const n = checked.size;
+  document.getElementById('btnPubY').disabled = n === 0;
+  document.getElementById('btnPubN').disabled = n === 0;
+}
+
+/* ── 오버레이 미리보기 카드 ── */
+function showCard(i) {
+  const r = rows[i];
+  document.getElementById('pvBody').innerHTML = `
+    <div class="pv-title">${r.notice ? '<span class="badge-notice">공지</span>' : ''}${r.title}</div>
+    <div class="pv-meta">
+      등록 ${r.reg} · 조회 ${r.views} · 공개 <span class="${r.pub ? 'pv-pub-y' : 'pv-pub-n'}">${r.pub ? 'Y' : 'N'}</span>
+    </div>
+    <div class="pv-content">${r.content}</div>`;
+  document.getElementById('pvCard').classList.add('show');
+}
+function hoverRow(i) {
+  if (pinned !== null) return;
+  showCard(i);
+}
+function togglePin(i) {
+  if (pinned === i) { unpin(); return; }
+  pinned = i;
+  showCard(i);
+  document.getElementById('pvPin').classList.add('show');
+  renderList();
+}
+function unpin() {
+  pinned = null;
+  document.getElementById('pvPin').classList.remove('show');
+  renderList();
+}
+function closeCard() {
+  unpin();
+  document.getElementById('pvCard').classList.remove('show');
+}
+/* 표 영역을 벗어나면(고정 아닐 때) 카드 숨김 — 카드도 영역 안에 있어 카드 위에선 유지됨 */
+document.getElementById('tableZone').addEventListener('mouseleave', () => {
+  if (pinned === null) document.getElementById('pvCard').classList.remove('show');
+});
+
+/* ── 선택/일괄 처리 ── */
+function rowChk(i, on) { on ? checked.add(i) : checked.delete(i); renderList(); }
+function selAll(on) {
+  checked.clear();
+  if (on) rows.forEach((r, i) => checked.add(i));
+  document.getElementById('chkHead').checked = on;
+  renderList();
+}
+function bulkSet(pub) {
+  const n = checked.size;
+  checked.forEach(i => { rows[i].pub = pub; });
+  checked.clear();
+  document.getElementById('chkHead').checked = false;
+  renderList();
+  if (pinned !== null) showCard(pinned);
+  toast(`${n}건 ${pub ? '공개' : '비공개'} 처리가 완료되었습니다.`);
+}
+
+renderList();
+</script>
+</body>
+</html>
