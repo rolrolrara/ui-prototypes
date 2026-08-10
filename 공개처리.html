@@ -116,10 +116,28 @@
   .gcard .tag { display:inline-block; font-size:12px; font-weight:800; border-radius:6px; padding:3px 10px; margin-bottom:12px; }
   .gcard.a .tag { background:#ede9fe; color:#6d28d9; }
   .gcard.b .tag { background:#dbeafe; color:#1d4ed8; }
+  .gcard.c .tag { background:#dcfce7; color:#15803d; }
   .gcard h3 { font-size:16px; color:#111827; margin-bottom:10px; }
   .gcard p { font-size:13px; color:#4b5563; line-height:1.7; }
   .gcard .flow { margin-top:14px; background:#f9fafb; border-radius:8px; padding:10px 14px; font-size:12.5px; color:#374151; line-height:1.9; }
   .guide-foot { margin-top:24px; font-size:12.5px; color:#9ca3af; line-height:1.7; }
+
+  /* ── C안 ─────────────────────────── */
+  .total-row { display:flex; align-items:center; margin:2px 0 10px; }
+  .total-row .total { margin:0; }
+  .total-row .tr-right { margin-left:auto; display:flex; gap:8px; }
+  .btn-newpost { background:#fff; border:1px solid #93c5fd; color:#2563eb; }
+  .c-toolbar { display:flex; align-items:center; justify-content:flex-end; gap:10px; margin:0 0 10px; }
+  .c-toolbar .c-label { font-size:13px; color:#374151; font-weight:600; }
+  table.compact { font-size:12px; }
+  table.compact tbody td { padding:7px 4px; }
+  td.cat-cell { white-space:normal; line-height:1.4; }
+  .badge-admin { background:#f59e0b; color:#fff; font-size:10.5px; border-radius:4px; padding:1.5px 6px; margin-right:4px; }
+  .pager { display:flex; align-items:center; justify-content:center; gap:6px; margin:16px 0 4px; font-size:12.5px; color:#6b7280; }
+  .pager .pg { min-width:26px; height:26px; border:1px solid #e5e7eb; border-radius:5px; background:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+  .pager .pg.on { border-color:#3b82f6; color:#2563eb; font-weight:700; }
+  .pager select, .pager input { border:1px solid #d1d5db; border-radius:5px; padding:4px 6px; font-size:12px; }
+  .pager input { width:44px; text-align:center; }
 
   /* ── 토스트 ─────────────────────────── */
   #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:#111827; color:#fff; font-size:13.5px; padding:11px 22px; border-radius:24px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:99; box-shadow:0 6px 18px rgba(0,0,0,.3); }
@@ -132,6 +150,7 @@
   <button class="nav-btn active" onclick="showScreen('screen-guide')">안내</button>
   <button class="nav-btn" onclick="showScreen('screen-detail')">A안 · 상세 즉시 공개</button>
   <button class="nav-btn" onclick="showScreen('screen-list')">B안 · 목록 일괄 처리</button>
+  <button class="nav-btn" onclick="showScreen('screen-list-c')">C안 · 목록 간소형</button>
 </nav>
 
 <div class="device-frame">
@@ -167,6 +186,18 @@
           </p>
           <div class="flow">
             검수 동선: 검색으로 대상 좁히기 → 전체 선택 후 문제 글만 체크 해제 → 일괄 공개
+          </div>
+        </div>
+        <div class="gcard c" onclick="showScreen('screen-list-c')">
+          <span class="tag">C안</span>
+          <h3>목록 일괄 처리 — 실화면 기준 간소형</h3>
+          <p>
+            실제 게시판관리 화면 구성을 그대로 유지한 채 체크박스만 추가하고,
+            목록 우측 상단에 <b>"✓ 선택한 회원에 대해 [선택 공개] [선택 비공개]"</b> 버튼을 배치한 안.
+            엑셀 다운로드 버튼은 총 N개 행 오른쪽, 기간·작성자(회원번호) 검색이 함께 추가됩니다.
+          </p>
+          <div class="flow">
+            검수 동선: 기간·회원번호로 검색 → 대상 글 체크 → 선택 공개/비공개
           </div>
         </div>
       </div>
@@ -335,6 +366,111 @@
     </div>
   </div>
 
+  <!-- ═══════════ C안 · 목록 간소형 (실화면 기준) ═══════════ -->
+  <div class="screen" id="screen-list-c">
+    <div class="gnb">
+      <div class="logo"><span class="dot"></span> 통합관리자</div>
+      <a>회원관리</a><a>학원/클래스</a><a class="on">서비스운영</a><a>교사업무관리</a><a>교사업무현황조회</a><a>주문관리</a><a>시스템</a>
+      <span class="right">☁️ 캣톡 · 관리자센터 이동</span>
+    </div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="profile"><span class="avatar">👤</span> 고진미</div>
+        <span class="menu on">게시판 목록</span>
+        <span class="menu">사용자저작</span>
+        <span class="menu">교재</span>
+        <span class="menu">기준정보관리</span>
+        <span class="menu">엑셀 다운 관리</span>
+        <span class="menu">개인정보 인출 관리</span>
+        <span class="menu">프로모션관리 A타입</span>
+        <span class="menu">프로모션관리 B타입</span>
+        <span class="menu">프로모션관리 C타입</span>
+        <span class="menu">데이터 다운로드</span>
+        <span class="menu">포인트 업로드</span>
+        <span class="menu">시스템 자동문자/알림톡 템플릿관리</span>
+        <span class="menu">이벤트 배너</span>
+      </aside>
+      <main class="content">
+        <div class="breadcrumb">🏠 › 서비스운영 › 게시판관리</div>
+        <div class="page-title">게시판관리</div>
+        <div class="board-name">캐츠 학생 이벤트</div>
+
+        <div class="plan-note">
+          <b>C안 변경 지점</b> — ① 엑셀 다운로드 버튼(총 N개 행 우측) ② 기간·작성자(회원번호) 검색
+          ③ 목록 체크박스 + 우측 상단 <b>"✓ 선택한 회원에 대해 [선택 공개] [선택 비공개]"</b>(즉시 반영).
+          그 외 화면 구성은 현재 운영 화면과 동일.
+        </div>
+
+        <div class="search-box">
+          <div class="search-row">
+            <span class="f-label">검색어</span>
+            <select><option>작성자(회원번호)</option><option>제목</option></select>
+            <input type="text">
+            <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 공지글만 검색</label>
+            <label style="font-size:12.5px;color:#6b7280;"><input type="checkbox"> 추천만 검색</label>
+            <span class="f-label">회원구분</span><select><option>전체</option></select>
+          </div>
+          <div class="search-row">
+            <span class="f-label">카테고리</span><select><option>전체</option></select><select><option>전체</option></select>
+            <span class="f-label">답변여부</span>
+            <span class="seg"><button class="on">전체</button><button>답변완료</button><button>미처리</button></span>
+            <span class="f-label">공개여부</span>
+            <span class="seg"><button class="on">전체</button><button>공개</button><button>미공개</button></span>
+          </div>
+          <div class="search-row" style="margin-bottom:0;">
+            <span class="f-label">기간</span>
+            <select><option>등록일</option><option>수정일</option></select>
+            <input type="text" value="2026.05.30 ~ 2026.06.02" style="width:190px;"> <span style="font-size:14px;">📅</span>
+            <span style="margin-left:auto;"><button class="btn btn-primary">검색</button></span>
+          </div>
+        </div>
+
+        <div class="total-row">
+          <span class="total">• 총 <b>56</b>개</span>
+          <span class="tr-right">
+            <button class="btn btn-line hl-new" onclick="toast('검색 조건(기간 포함) 기준으로 엑셀 다운로드됩니다.')">엑셀 다운로드</button>
+            <button class="btn btn-newpost">+ 새 게시글</button>
+          </span>
+        </div>
+
+        <div class="c-toolbar hl-new">
+          <span class="new-mark">변경</span>
+          <span class="c-label">✓ 선택한 회원에 대해</span>
+          <button class="btn btn-primary" id="btnPubYC" onclick="bulkSetC(true)" disabled>선택 공개</button>
+          <button class="btn btn-primary" style="background:#2563eb;" id="btnPubNC" onclick="bulkSetC(false)" disabled>선택 비공개</button>
+        </div>
+
+        <table class="compact">
+          <thead>
+            <tr>
+              <th style="width:32px;"><input type="checkbox" id="chkHeadC" onchange="selAllC(this.checked)"></th>
+              <th style="width:44px;">순번</th>
+              <th style="width:92px;">카테고리</th>
+              <th style="text-align:left;">제목</th>
+              <th style="width:52px;">조회수</th>
+              <th style="width:58px;">답변여부</th>
+              <th style="width:48px;">공지글</th>
+              <th style="width:108px;">작성자</th>
+              <th style="width:98px;">최근 수정자</th>
+              <th style="width:118px;">등록일시</th>
+              <th style="width:118px;">수정일시</th>
+              <th style="width:38px;">공개</th>
+            </tr>
+          </thead>
+          <tbody id="listBodyC"></tbody>
+        </table>
+
+        <div class="pager">
+          <span class="pg">‹</span>
+          <span class="pg on">1</span><span class="pg">2</span><span class="pg">3</span><span class="pg">4</span><span class="pg">5</span><span class="pg">6</span>
+          <span class="pg">›</span>
+          <select><option>10개 보기</option></select>
+          <input type="text" value="1"> 페이지 이동
+        </div>
+      </main>
+    </div>
+  </div>
+
 </div>
 
 <div id="toast"></div>
@@ -476,8 +612,67 @@ function togglePublic(chk) {
 }
 function openDetail(i) { cur = i; renderDetail(); showScreen('screen-detail'); }
 
+/* ── C안: 실화면 기준 간소형 목록 ── */
+const rowsC = [
+  { no:56, title:'ㅈㄷㅅㄱㅈㄷ_1115258', notice:true,  views:4,  ans:'N', reg:'2026.01.28 15:50:41', upd:'2026.02.03 10:30:38', pub:true },
+  { no:55, title:'ㅎ_1115450',          notice:true,  views:3,  ans:'N', reg:'2025.10.29 13:55:37', upd:'2026.02.03 10:28:33', pub:true },
+  { no:54, title:'나야_1114836',        notice:true,  views:3,  ans:'N', reg:'2025.10.29 11:58:01', upd:'2026.02.03 10:28:00', pub:true },
+  { no:53, title:'test_1115720',        notice:false, views:0,  ans:'N', author:'테***넷(1115720)',   reg:'2026.05.20 14:37:57', upd:'2026.05.20 14:37:57', pub:true },
+  { no:52, title:'test_1115720',        notice:false, views:0,  ans:'N', author:'테***넷(1115720)',   reg:'2026.05.20 14:37:48', upd:'2026.05.20 14:37:48', pub:true },
+  { no:51, title:'깜뚱쓰_1115096',      notice:false, views:0,  ans:'N', author:'테*린(1115096)',     reg:'2026.04.29 10:31:11', upd:'2026.04.29 10:31:11', pub:true },
+  { no:50, title:'ㅇㅇ_1115623',        notice:false, views:3,  ans:'N', author:'테*****들(1115623)', modBy:'고*미(10058)', reg:'2026.04.03 11:51:19', upd:'2026.04.23 17:08:28', pub:true },
+  { no:49, title:'ㄹㅊ_111511(댓글 2)', notice:false, views:19, ans:'Y', author:'테******년(1115113)', modBy:'고*미(10058)', reg:'2026.01.28 16:02:29', upd:'2026.05.04 14:05:48', pub:true },
+  { no:48, title:'ㅈㄱㄷㅅ_1115258',    notice:false, views:0,  ans:'N', author:'테*네(1115258)',     reg:'2026.01.28 15:50:32', upd:'2026.01.28 15:50:32', pub:true },
+  { no:47, title:'ㅇㄹ_1115113',        notice:false, views:1,  ans:'N', author:'테*****년(1115113)', reg:'2026.01.02 14:57:27', upd:'2026.01.02 14:57:27', pub:true },
+];
+const checkedC = new Set();
+function renderListC() {
+  const tb = document.getElementById('listBodyC');
+  tb.innerHTML = rowsC.map((r, i) => {
+    const chk = r.notice
+      ? '<input type="checkbox" disabled title="공지글은 일괄 처리 대상이 아닙니다">'
+      : `<input type="checkbox" ${checkedC.has(i) ? 'checked' : ''} onchange="rowChkC(${i}, this.checked)">`;
+    const noticeBadge = r.notice ? '<span class="badge-notice">공지</span>' : '';
+    const author = r.notice ? '-' : `<span class="badge-member">회원</span>${r.author}`;
+    const modBy = r.modBy ? `<span class="badge-admin">관리자</span>${r.modBy}` : '-';
+    return `<tr class="${checkedC.has(i) ? 'row-checked' : ''}">
+      <td>${chk}</td>
+      <td>${r.no}</td>
+      <td class="cat-cell">친구들의 캐츠 활용기</td>
+      <td class="t-title">${noticeBadge}<span class="title-link">${r.title}</span></td>
+      <td>${r.views}</td>
+      <td>${r.ans}</td>
+      <td>${r.notice ? '공지' : '-'}</td>
+      <td>${author}</td>
+      <td>${modBy}</td>
+      <td>${r.reg}</td>
+      <td>${r.upd}</td>
+      <td><span class="${r.pub ? 'pub-y' : 'pub-n'}">${r.pub ? 'Y' : 'N'}</span></td>
+    </tr>`;
+  }).join('');
+  const n = checkedC.size;
+  document.getElementById('btnPubYC').disabled = n === 0;
+  document.getElementById('btnPubNC').disabled = n === 0;
+}
+function rowChkC(i, on) { on ? checkedC.add(i) : checkedC.delete(i); renderListC(); }
+function selAllC(on) {
+  checkedC.clear();
+  if (on) rowsC.forEach((r, i) => { if (!r.notice) checkedC.add(i); });
+  document.getElementById('chkHeadC').checked = on;
+  renderListC();
+}
+function bulkSetC(pub) {
+  const n = checkedC.size;
+  checkedC.forEach(i => { rowsC[i].pub = pub; });
+  checkedC.clear();
+  document.getElementById('chkHeadC').checked = false;
+  renderListC();
+  toast(`${n}건 ${pub ? '공개' : '비공개'} 처리가 완료되었습니다.`);
+}
+
 renderList();
 renderDetail();
+renderListC();
 </script>
 </body>
 </html>
