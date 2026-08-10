@@ -194,7 +194,7 @@
           <p>
             실제 게시판관리 화면 구성을 그대로 유지한 채 체크박스만 추가하고,
             목록 우측 상단에 <b>"✓ 선택한 회원에 대해 [선택 공개] [선택 비공개]"</b> 버튼을 배치한 안.
-            엑셀 다운로드 버튼은 총 N개 행 오른쪽, 기간·작성자(회원번호) 검색이 함께 추가됩니다.
+            엑셀 다운로드 버튼은 총 N개 바로 옆, 기간·작성자(회원번호) 검색이 함께 추가됩니다.
           </p>
           <div class="flow">
             검수 동선: 기간·회원번호로 검색 → 대상 글 체크 → 선택 공개/비공개
@@ -395,12 +395,6 @@
         <div class="page-title">게시판관리</div>
         <div class="board-name">캐츠 학생 이벤트</div>
 
-        <div class="plan-note">
-          <b>C안 변경 지점</b> — ① 엑셀 다운로드 버튼(총 N개 행 우측) ② 기간·작성자(회원번호) 검색
-          ③ 목록 체크박스 + 우측 상단 <b>"✓ 선택한 회원에 대해 [선택 공개] [선택 비공개]"</b>(즉시 반영).
-          그 외 화면 구성은 현재 운영 화면과 동일.
-        </div>
-
         <div class="search-box">
           <div class="search-row">
             <span class="f-label">검색어</span>
@@ -427,17 +421,12 @@
 
         <div class="total-row">
           <span class="total">• 총 <b>56</b>개</span>
-          <span class="tr-right">
-            <button class="btn btn-line hl-new" onclick="toast('검색 조건(기간 포함) 기준으로 엑셀 다운로드됩니다.')">엑셀 다운로드</button>
-            <button class="btn btn-newpost">+ 새 게시글</button>
+          <button class="btn btn-line" style="margin-left:10px;" onclick="toast('검색 조건(기간 포함) 기준으로 엑셀 다운로드됩니다.')">엑셀 다운로드</button>
+          <span class="tr-right" style="align-items:center; gap:10px;">
+            <span class="c-label">✓ 선택한 회원에 대해</span>
+            <button class="btn btn-primary" id="btnPubYC" onclick="bulkSetC(true)" disabled>선택 공개</button>
+            <button class="btn btn-primary" style="background:#2563eb;" id="btnPubNC" onclick="bulkSetC(false)" disabled>선택 비공개</button>
           </span>
-        </div>
-
-        <div class="c-toolbar hl-new">
-          <span class="new-mark">변경</span>
-          <span class="c-label">✓ 선택한 회원에 대해</span>
-          <button class="btn btn-primary" id="btnPubYC" onclick="bulkSetC(true)" disabled>선택 공개</button>
-          <button class="btn btn-primary" style="background:#2563eb;" id="btnPubNC" onclick="bulkSetC(false)" disabled>선택 비공개</button>
         </div>
 
         <table class="compact">
