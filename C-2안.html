@@ -192,7 +192,7 @@
             <button class="pv-close" onclick="closeCard()">✕</button>
           </div>
           <div class="pv-body" id="pvBody"></div>
-          <div class="pv-foot">마우스 오버 = 미리보기(0.3초 머문 행 기준 전환) · 행 클릭 = 고정/해제 · 제목 클릭 = 상세 이동</div>
+          <div class="pv-foot">마우스 오버 = 미리보기(카드로 이동 중에만 전환 지연) · 행 클릭 = 고정/해제 · 제목 클릭 = 상세 이동</div>
         </aside>
 
         <div class="pager">
@@ -285,14 +285,22 @@ function showCard(i) {
   document.getElementById('pvCard').classList.add('show');
 }
 let hoverTimer = null;
+let lastX = 0, lastY = 0, movingToCard = false;
+document.getElementById('tableZone').addEventListener('mousemove', (e) => {
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  // 오른쪽(카드 방향) 이동이 수직 이동보다 클 때만 "카드로 가는 중"으로 판단
+  movingToCard = dx > 3 && dx > Math.abs(dy);
+  lastX = e.clientX; lastY = e.clientY;
+});
 function hoverRow(i) {
   if (pinned !== null) return;
   clearTimeout(hoverTimer);
   const card = document.getElementById('pvCard');
-  if (!card.classList.contains('show')) {
-    showCard(i); // 첫 미리보기는 즉시
+  if (!card.classList.contains('show')) { showCard(i); return; } // 첫 미리보기는 즉시
+  if (movingToCard) {
+    hoverTimer = setTimeout(() => showCard(i), 250); // 카드로 향하는 중에만 지연 — 스치는 행에 안 뺏김
   } else {
-    hoverTimer = setTimeout(() => showCard(i), 300); // 전환은 0.3초 머문 행 기준 — 카드로 가는 길에 스치는 행 무시
+    showCard(i); // 위아래 훑기는 즉시 전환
   }
 }
 function togglePin(i) {
