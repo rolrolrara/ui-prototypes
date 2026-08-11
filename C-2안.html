@@ -70,7 +70,7 @@
   .pub-n { color:#9ca3af; font-weight:700; }
 
   /* ── 오버레이 내용 미리보기 카드 ─────────────────────────── */
-  .overlay-card { position:absolute; top:0; right:0; width:340px; max-height:540px; background:#fff; border:1px solid #d1d5db; border-radius:12px; box-shadow:0 14px 36px rgba(0,0,0,.20); display:none; flex-direction:column; overflow:hidden; z-index:20; }
+  .overlay-card { position:absolute; top:0; right:0; width:380px; max-height:540px; background:#fff; border:1px solid #d1d5db; border-radius:12px; box-shadow:0 14px 36px rgba(0,0,0,.20); display:none; flex-direction:column; overflow:hidden; z-index:20; }
   .overlay-card.show { display:flex; }
   .pv-head { display:flex; align-items:center; gap:8px; padding:10px 14px; background:#f9fafb; border-bottom:1px solid #e5e7eb; font-size:13px; font-weight:700; color:#374151; }
   .pv-pin { font-size:11.5px; font-weight:600; color:#b45309; background:#fef3c7; border-radius:10px; padding:2px 9px; display:none; cursor:pointer; }
@@ -192,7 +192,7 @@
             <button class="pv-close" onclick="closeCard()">✕</button>
           </div>
           <div class="pv-body" id="pvBody"></div>
-          <div class="pv-foot">마우스 오버 = 미리보기 · 행 클릭 = 고정/해제</div>
+          <div class="pv-foot">마우스 오버 = 미리보기(0.3초 머문 행 기준 전환) · 행 클릭 = 고정/해제 · 제목 클릭 = 상세 이동</div>
         </aside>
 
         <div class="pager">
@@ -257,7 +257,7 @@ function renderList() {
       <td onclick="event.stopPropagation()"><input type="checkbox" ${checked.has(i) ? 'checked' : ''} onchange="rowChk(${i}, this.checked)"></td>
       <td>${r.no}</td>
       <td>-</td>
-      <td class="t-title">${noticeBadge}<span class="title-link">${r.title}</span></td>
+      <td class="t-title">${noticeBadge}<span class="title-link" onclick="event.stopPropagation(); toast('게시글 상세 화면으로 이동합니다. (기존 동작 유지 — 프로토에서는 이동 생략)')">${r.title}</span></td>
       <td>${r.views}</td>
       <td>${r.ans}</td>
       <td>${r.notice ? '공지' : '-'}</td>
@@ -284,9 +284,16 @@ function showCard(i) {
     <div class="pv-content">${r.content}</div>`;
   document.getElementById('pvCard').classList.add('show');
 }
+let hoverTimer = null;
 function hoverRow(i) {
   if (pinned !== null) return;
-  showCard(i);
+  clearTimeout(hoverTimer);
+  const card = document.getElementById('pvCard');
+  if (!card.classList.contains('show')) {
+    showCard(i); // 첫 미리보기는 즉시
+  } else {
+    hoverTimer = setTimeout(() => showCard(i), 300); // 전환은 0.3초 머문 행 기준 — 카드로 가는 길에 스치는 행 무시
+  }
 }
 function togglePin(i) {
   if (pinned === i) { unpin(); return; }
@@ -306,6 +313,7 @@ function closeCard() {
 }
 /* 표 영역을 벗어나면(고정 아닐 때) 카드 숨김 — 카드도 영역 안에 있어 카드 위에선 유지됨 */
 document.getElementById('tableZone').addEventListener('mouseleave', () => {
+  clearTimeout(hoverTimer);
   if (pinned === null) document.getElementById('pvCard').classList.remove('show');
 });
 
