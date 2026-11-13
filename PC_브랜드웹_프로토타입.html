@@ -171,9 +171,11 @@
   .benefit .btn-p{ background:#fff; color:var(--vio); }
 
   /* 게시판 */
-  .board-head{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
-  .board-head h2{ font-size:28px; font-weight:800; }
-  .board-head p{ color:var(--muted); font-size:14.5px; margin:0; }
+  .board-head{ position:relative; text-align:center; margin-bottom:28px; padding-bottom:24px; }
+  .board-head::after{ content:""; position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:100vw; height:1px; background:var(--line); }
+  .board-head h2{ font-size:30px; font-weight:800; letter-spacing:-.5px; }
+  .board-head p{ display:none; }
+  #s-qna .board-head p{ display:block; color:var(--muted); font-size:14.5px; margin:10px 0 0; }
   #s-review section, #s-notice section, #s-qna section, #s-edu section{ padding-top:40px; }
   .filters{ display:flex; gap:10px; align-items:center; margin:22px 0 18px; flex-wrap:wrap; }
   .seg{ display:inline-flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
@@ -250,24 +252,25 @@
   .btn-submit{ width:100%; background:var(--vio); color:#fff; border:none; border-radius:12px; padding:18px; font-size:17px; font-weight:800; cursor:pointer; margin-top:28px; }
   .btn-submit:hover{ background:var(--vio2); }
 
-  /* 하단 무료학습 신청 플로팅 바 */
-  #floatCta{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); z-index:60; max-width:calc(100% - 32px); background:linear-gradient(90deg,#ffdf4d,#ffd21e); box-shadow:0 -4px 24px rgba(0,0,0,.18); border:1px solid #f2c200; border-bottom:none; border-radius:44px 44px 0 0; }
-  #floatCta .fc-wrap{ display:flex; align-items:center; gap:24px; padding:11px 34px 11px 214px; position:relative; }
-  .fc-gift{ position:absolute; left:20px; bottom:13px; display:flex; align-items:flex-end; flex-shrink:0; }
-  .fc-gift img{ height:82px; width:auto; display:block; filter:drop-shadow(0 3px 5px rgba(0,0,0,.22)); }
-  .fc-gift .g-device{ margin-left:-14px; }
-  .fc-msg{ color:#2a2733; font-size:17px; font-weight:800; line-height:1.3; white-space:nowrap; }
-  .fc-msg .accent{ color:var(--vio); }
-  .fc-msg small{ display:block; font-size:12.5px; font-weight:600; color:#8a7414; margin-top:3px; }
-  .fc-btns{ margin-left:auto; display:flex; gap:10px; }
-  .fc-btn{ font-weight:800; font-size:14px; border-radius:999px; padding:10px 20px; cursor:pointer; text-decoration:none; white-space:nowrap; }
-  .fc-btn.kakao{ background:#3a2e00; color:#ffe14d; }
-  .fc-btn.primary{ background:var(--vio); color:#fff; }
-  .fc-close{ background:transparent; border:none; color:#5c4f12; font-size:22px; cursor:pointer; line-height:1; padding:2px 4px; }
-  #floatCta{ display:none; }
-  body[data-screen="s-eng"] #floatCta, body[data-screen="s-all"] #floatCta{ display:block; }
+  /* 하단 무료학습 신청 플로팅 — 배너 2개(각 배너 전체가 버튼) */
+  #floatCta{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); z-index:60; width:calc(100% - 40px); max-width:1120px; display:none; gap:12px; }
+  .fc-banner{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; gap:9px; min-height:58px; padding:8px 16px; border-radius:16px 16px 0 0; text-decoration:none; cursor:pointer; box-shadow:0 -4px 18px rgba(0,0,0,.16); }
+  .fc-banner.blue{ background:#5b93dd; }
+  .fc-banner.yellow{ background:#ffd21e; }
+  .fc-bimg{ position:absolute; bottom:0; height:92px; width:auto; filter:drop-shadow(0 4px 7px rgba(0,0,0,.3)); pointer-events:none; }
+  .fc-bimg.l{ left:4px; }
+  .fc-bimg.r{ right:4px; }
+  .fc-btxt{ display:flex; align-items:center; gap:8px; white-space:nowrap; z-index:1; }
+  .fc-btxt small{ font-size:13px; font-weight:600; opacity:.85; }
+  .fc-btxt b{ font-size:18px; font-weight:800; }
+  .fc-banner.blue .fc-btxt{ color:#0d2550; }
+  .fc-banner.yellow .fc-btxt{ color:#5c4200; }
+  .fc-arrow{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,.55); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; z-index:1; flex-shrink:0; }
+  .fc-banner.blue .fc-arrow{ color:#0d2550; }
+  .fc-banner.yellow .fc-arrow{ color:#5c4200; }
+  body[data-screen="s-eng"] #floatCta, body[data-screen="s-all"] #floatCta{ display:flex; }
   body.hide-floatcta #floatCta{ display:none; }
-  @media (max-width:860px){ .fc-msg small{ display:none; } .fc-gift{ display:none; } #floatCta .fc-wrap{ padding-left:22px; } }
+  @media (max-width:720px){ .fc-btxt b{ font-size:15px; } .fc-btxt small{ display:none; } .fc-bimg{ height:72px; } }
 
   /* 우측 날개 배너 — A(상품 탭): 교차 노출 / B(게시판 탭): 영상형 */
   #wingBanner, #wingBanner2{ position:fixed; right:16px; top:58%; transform:translateY(-40%); z-index:55; width:186px; display:none; }
@@ -355,22 +358,18 @@
   .post-cta .btn-p{ display:inline-block; background:var(--vio); color:#fff; padding:16px 48px; border-radius:999px; font-size:16px; font-weight:800; border:none; cursor:pointer; }
   .post-foot{ border-top:1px solid var(--line); margin-top:34px; padding-top:26px; display:flex; justify-content:center; }
   .listbtn{ border:1.5px solid var(--line2); background:#fff; color:#4b5563; border-radius:999px; padding:12px 44px; font-size:14.5px; font-weight:700; cursor:pointer; }
+  /* 상세 이전/목록/다음 네비 */
+  .post-nav{ border-top:1px solid var(--line); margin-top:34px; padding-top:26px; display:flex; align-items:center; justify-content:center; gap:14px; }
+  .pn-arrow{ width:46px; height:46px; border-radius:50%; border:none; background:var(--vio-l); color:var(--vio); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .pn-arrow:hover{ background:var(--vio); color:#fff; }
+  .pn-list{ display:inline-flex; align-items:center; gap:8px; border:none; background:var(--vio-l); color:var(--vio); border-radius:999px; padding:12px 30px; font-size:15px; font-weight:800; cursor:pointer; }
+  .pn-list:hover{ background:var(--vio); color:#fff; }
+  .pn-list svg{ width:16px; height:16px; }
   /* 공유하기 — 단일 버튼 + 팝업 */
-  .share-wrap{ position:absolute; top:0; right:0; }
-  .share-toggle{ display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--line2); background:#fff; color:#4b5563; border-radius:999px; padding:9px 16px; font-size:13.5px; font-weight:700; cursor:pointer; }
-  .share-toggle:hover{ border-color:var(--vio-l); color:var(--vio); }
-  .share-toggle svg{ width:16px; height:16px; }
-  .share-pop{ position:absolute; top:calc(100% + 10px); right:0; z-index:12; background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 14px 34px rgba(0,0,0,.16); padding:16px 18px; display:none; }
-  .share-pop.open{ display:block; }
-  .share-pop::before{ content:""; position:absolute; top:-7px; right:24px; width:12px; height:12px; background:#fff; border-left:1px solid var(--line); border-top:1px solid var(--line); transform:rotate(45deg); }
-  .share-pop .pt{ font-size:12px; color:#9ca3af; margin-bottom:12px; text-align:center; white-space:nowrap; }
-  .share-opts{ display:flex; gap:16px; }
-  .share-opt{ display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; font-size:11.5px; color:#4b5563; border:none; background:transparent; }
-  .share-opt .ic{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; }
-  .share-opt .ic.kakao{ background:#FEE500; color:#3A1D1D; }
-  .share-opt .ic.naver{ background:#03C75A; }
-  .share-opt .ic.fb{ background:#1877F2; }
-  .share-opt .ic.link{ background:#6b7280; }
+  .share-wrap{ position:absolute; top:0; right:0; display:flex; gap:10px; }
+  .share-ic{ width:40px; height:40px; border-radius:50%; border:none; background:#adb3bd; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .share-ic:hover{ background:#8b919c; }
+  .share-ic svg{ width:20px; height:20px; display:block; }
 
   /* 선생님 모집 */
   .tr-hero{ background:linear-gradient(135deg,#b300f2,#7a00c2); color:#fff; border-radius:20px; padding:56px 40px; text-align:center; margin-top:8px; }
@@ -414,7 +413,8 @@
 
   /* 푸터 */
   .site-footer{ background:#2a2733; color:#b9b4c6; padding:40px 0 96px; }
-  .site-footer .flinks{ display:flex; gap:24px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid #413c50; }
+  .site-footer .flinks{ display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid #413c50; }
+  .site-footer .flinks .sns{ margin-left:auto; }
   .site-footer .flinks a{ font-size:14px; color:#e6e2f0; text-decoration:none; font-weight:600; }
   .site-footer .flinks a:hover{ color:#fff; }
   .site-footer .frow{ display:flex; justify-content:space-between; gap:30px; margin-top:22px; flex-wrap:wrap; }
@@ -967,7 +967,11 @@
             <p>우리 아이의 영어 인풋과 아웃풋이 균형 있게 이어질 수 있도록 캐츠잉글리시가 함께하겠습니다.</p>
           </div>
           <div class="post-cta"><button class="btn-p" data-s="s-apply">특별 선물 포함 무료학습 신청</button></div>
-          <div class="post-foot"><button class="listbtn" data-s="s-review">목록</button></div>
+          <div class="post-nav">
+            <button class="pn-arrow" title="이전 글" aria-label="이전 글">‹</button>
+            <button class="pn-list" data-s="s-review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>목록</button>
+            <button class="pn-arrow" title="다음 글" aria-label="다음 글">›</button>
+          </div>
         </article>
       </div>
     </section>
@@ -1005,23 +1009,16 @@
     <section>
       <div class="wrap">
         <div class="board-head"><h2><span class="new-mark">신규</span>교육정보</h2></div>
-        <div class="plan-note in"><span class="new-mark">신규·미정</span>교육정보 <b>상세</b> — 세부 구성 미정(모바일 기준 기획서 확정 시 반영). 요청서상 상세에는 <b>공유하기 기능</b> 포함 — 상단에 <b>공유하기 버튼 1개</b>, 클릭 시 공유 채널 팝업 노출. 아래는 예시 구성.</div>
+        <div class="plan-note in"><span class="new-mark">신규·미정</span>교육정보 <b>상세</b> — 세부 구성 미정(모바일 기준 기획서 확정 시 반영). 요청서상 상세에는 <b>공유하기 기능</b> 포함 — 상단 우측에 <b>공유 아이콘(카카오톡·인스타그램·링크 복사)</b> 노출. 아래는 예시 구성.</div>
         <article class="post">
           <div class="post-head">
             <div class="post-tags"><span class="post-cat rec"><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z"/></svg>추천</span><span class="edu-tag t1">교육정책&amp;트렌드</span></div>
             <h1 class="post-title">2025 개정 교육과정, 초등 영어는 무엇이 달라지나</h1>
             <div class="post-date">2026-11-10</div>
             <div class="share-wrap">
-              <button class="share-toggle" id="eduShareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>공유하기</button>
-              <div class="share-pop" id="eduSharePop">
-                <div class="pt">이 글 공유하기</div>
-                <div class="share-opts">
-                  <button class="share-opt"><span class="ic kakao">💬</span>카카오톡</button>
-                  <button class="share-opt"><span class="ic naver">N</span>블로그</button>
-                  <button class="share-opt"><span class="ic fb">f</span>페이스북</button>
-                  <button class="share-opt"><span class="ic link">🔗</span>링크 복사</button>
-                </div>
-              </div>
+              <button class="share-ic" title="카카오톡" aria-label="카카오톡 공유"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></button>
+              <button class="share-ic" title="인스타그램" aria-label="인스타그램 공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg></button>
+              <button class="share-ic" title="링크 복사" aria-label="링크 복사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></button>
             </div>
           </div>
           <div class="post-img ph">본문 이미지 영역</div>
@@ -1031,7 +1028,11 @@
             <div class="post-img ph">본문 이미지 영역</div>
             <p>특히 영어를 처음 시작하는 저학년일수록 '정확성'보다 '꾸준함'이 중요합니다. 레벨에 맞는 인풋을 매일 조금씩 쌓고, 말하기 기회를 자주 만들어 주는 것이 개정 교육과정이 지향하는 방향과도 맞닿아 있습니다.</p>
           </div>
-          <div class="post-foot"><button class="listbtn" data-s="s-edu">목록</button></div>
+          <div class="post-nav">
+            <button class="pn-arrow" title="이전 글" aria-label="이전 글">‹</button>
+            <button class="pn-list" data-s="s-edu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>목록</button>
+            <button class="pn-arrow" title="다음 글" aria-label="다음 글">›</button>
+          </div>
         </article>
       </div>
     </section>
@@ -1093,7 +1094,11 @@
             <p><b>📍 연산 학습, 어디에서 시작하나요?</b></p>
             <p>① 전체 메뉴 &gt; 학교 공부 따라잡기 &gt; 수학 플러스 &gt; 연산<br>② 오늘의 학습 &gt; 연산 카드</p>
           </div>
-          <div class="post-foot"><button class="listbtn" data-s="s-notice">목록</button></div>
+          <div class="post-nav">
+            <button class="pn-arrow" title="이전 글" aria-label="이전 글">‹</button>
+            <button class="pn-list" data-s="s-notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>목록</button>
+            <button class="pn-arrow" title="다음 글" aria-label="다음 글">›</button>
+          </div>
         </article>
       </div>
     </section>
@@ -1103,7 +1108,7 @@
   <div class="screen" id="s-qna">
     <section>
       <div class="wrap">
-        <div class="board-head"><h2>Q&amp;A</h2></div>
+        <div class="board-head"><h2>Q&amp;A</h2><p>궁금한 점을 카테고리별로 빠르게 확인하세요</p></div>
         <div class="plan-note in"><span class="new-mark">PC</span>모바일 검색+카테고리 구조를 고객센터형으로 재배치. 카테고리는 <b>아이콘 카드 4개</b>(top5·서비스 안내·이용정책·콘텐츠/커리큘럼)로 시각화. 우측 고객센터·1:1 채팅 상담 영역. 영어집중코스 내 'Q&amp;A 영역'과의 관계(동일 데이터·역할)는 확인 항목.</div>
         <div class="faq-layout">
           <div class="faq-main">
@@ -1316,15 +1321,16 @@
 
   <!-- 하단 무료학습 신청 플로팅 바 (모바일 플로팅 → PC 하단 바) -->
   <div id="floatCta">
-    <div class="fc-wrap">
-      <div class="fc-gift"><img class="g-book" src="img/gift-book.webp" alt="초등 필수 영단어 교재 세트"><img class="g-device" src="img/gift-device.webp" alt="캐츠잉글리시 Full-Package"></div>
-      <div class="fc-msg">특별 선물 포함 <span class="accent">무료학습 신청</span><small>캐츠잉글리시 Full-Package + 초등 필수 영단어 교재 세트 증정</small></div>
-      <div class="fc-btns">
-        <a class="fc-btn kakao" data-s="s-apply">카톡 1초 신청</a>
-        <a class="fc-btn primary" data-s="s-apply">일반 무료학습 신청</a>
-      </div>
-      <button class="fc-close" title="닫기" aria-label="닫기">×</button>
-    </div>
+      <a class="fc-banner blue" data-s="s-apply">
+        <img class="fc-bimg l" src="img/gift-device.webp" alt="캐츠잉글리시 Full-Package">
+        <span class="fc-btxt"><small>카톡이 없다면</small><b>일반 무료학습 신청</b></span>
+        <span class="fc-arrow">›</span>
+      </a>
+      <a class="fc-banner yellow" data-s="s-apply">
+        <span class="fc-btxt"><small>카톡이 있다면</small><b>1초 무료학습 신청</b></span>
+        <span class="fc-arrow">›</span>
+        <img class="fc-bimg r" src="img/gift-book.webp" alt="초등 필수 영단어 교재 세트">
+      </a>
   </div>
 
   <!-- 푸터 (모든 화면 공통) — catsenglish.net 실제 내용 그대로 -->
@@ -1336,6 +1342,11 @@
         <a data-s="s-teacher">선생님 모집</a>
         <a href="https://www.danbiedu.co.kr/" target="_blank">회사소개</a>
         <a href="/faq">Q&amp;A</a>
+        <div class="sns"><span class="new-mark">신규</span>
+          <a class="sns-ic insta" href="#" title="인스타그램" aria-label="인스타그램"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4.5" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg></a>
+          <a class="sns-ic yt" href="#" title="유튜브" aria-label="유튜브"><svg viewBox="0 0 24 24" fill="#fff"><path d="M9.5 8.3v7.4l6.4-3.7z"/></svg></a>
+          <a class="sns-ic blog" href="#" title="블로그" aria-label="블로그">blog</a>
+        </div>
       </div>
       <div class="frow">
         <div class="info">
@@ -1357,11 +1368,6 @@
           </div>
           <div class="center-no">고객센터<br><b>1660-1244</b>월~금 10:00 ~ 20:00</div>
           <div class="mkt">제휴/마케팅 문의 <a href="mailto:marketing@danbiedu.co.kr">marketing@danbiedu.co.kr</a></div>
-          <div class="sns"><span class="new-mark">신규</span>
-            <a class="sns-ic insta" href="#" title="인스타그램" aria-label="인스타그램"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4.5" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg></a>
-            <a class="sns-ic yt" href="#" title="유튜브" aria-label="유튜브"><svg viewBox="0 0 24 24" fill="#fff"><path d="M9.5 8.3v7.4l6.4-3.7z"/></svg></a>
-            <a class="sns-ic blog" href="#" title="블로그" aria-label="블로그">blog</a>
-          </div>
         </div>
       </div>
       <div class="plan-note in" style="margin-top:22px"><span class="new-mark">확인</span>푸터는 <b>모바일 브랜드웹 실제 내용 그대로</b> 반영 + 요청서의 <b>SNS(인스타·유튜브·블로그) 신규 추가</b>. SNS <b>링크 URL은 수급 필요</b>(현재 자리만 배치).</div>
@@ -1410,14 +1416,6 @@
   if(wings.length > 1){
     let wi = 0;
     setInterval(()=>{ wi = (wi + 1) % wings.length; wings.forEach((w,i)=> w.classList.toggle('on', i===wi)); }, 4000);
-  }
-  // 교육정보 상세 — 공유하기 버튼/팝업 토글
-  const eduShareBtn = document.getElementById('eduShareBtn');
-  const eduSharePop = document.getElementById('eduSharePop');
-  if(eduShareBtn && eduSharePop){
-    eduShareBtn.addEventListener('click', (e)=>{ e.stopPropagation(); eduSharePop.classList.toggle('open'); });
-    document.addEventListener('click', (e)=>{ if(!eduSharePop.contains(e.target) && e.target!==eduShareBtn){ eduSharePop.classList.remove('open'); } });
-    eduSharePop.querySelectorAll('.share-opt').forEach(o=> o.addEventListener('click', (e)=>{ e.stopPropagation(); eduSharePop.classList.remove('open'); }));
   }
 </script>
 </body>
