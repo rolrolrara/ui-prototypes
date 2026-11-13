@@ -385,6 +385,11 @@
   .spinner .ring{ width:76px; height:76px; border-radius:50%; border:5px solid var(--vio-l); border-top-color:var(--vio); animation:spin .9s linear infinite; }
   .spinner .cat{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:24px; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  /* 에러·로딩 화면: 로고만 남기고 GNB·우측유틸·푸터 숨김 */
+  body.minimal-chrome .utility,
+  body.minimal-chrome .gnb nav,
+  body.minimal-chrome .gnb .cta,
+  body.minimal-chrome .site-footer{ display:none; }
 
   /* 선생님 모집 */
   .tr-hero{ background:linear-gradient(135deg,#b300f2,#7a00c2); color:#fff; border-radius:20px; padding:56px 40px; text-align:center; margin-top:8px; }
@@ -886,10 +891,6 @@
           <span class="eyebrow">필요한 교과 학습만</span>
           <h1>학원 여러 개 없이<br>초등 영어와 <span class="accent">교과 학습을 한 번에</span></h1>
           <p class="lead">실전 수학 · 국어 · 사회 · 과학까지, 유아부터 고등까지의 교육 노하우를 담아 만든 캐츠잉글리시 초등 전과목 학습</p>
-          <div class="btns">
-            <a class="btn btn-p">일반 무료학습 신청</a>
-            <a class="btn btn-o">카톡으로 1초 신청</a>
-          </div>
         </div>
         <div class="visual">국어 · 수학 · 사회 · 과학<br>전 과목 학습</div>
       </div>
@@ -1446,6 +1447,7 @@
     navBtns.forEach(b=> b.classList.toggle('active', b.dataset.s===id));
     gnbLinks.forEach(a=> a.classList.toggle('on', a.dataset.s===id));
     document.body.dataset.screen = id;
+    document.body.classList.toggle('minimal-chrome', id==='s-404' || id==='s-500' || id==='s-loading');
     window.scrollTo({top:0, behavior:'instant'});
   }
   document.body.dataset.screen = 's-eng';
