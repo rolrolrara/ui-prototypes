@@ -384,7 +384,7 @@
   .er-main{ flex:1 1 auto; min-width:0; padding-top:2px; }
   .er-main .edu-tag{ margin-bottom:13px; }
   .er-title{ font-size:20px; font-weight:800; line-height:1.4; margin-bottom:12px; }
-  .er-prev{ font-size:14.5px; color:var(--muted); line-height:1.7; }
+  .er-prev{ font-size:14.5px; color:var(--muted); line-height:1.7; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .er-side{ flex:0 0 78px; align-self:stretch; display:flex; flex-direction:column; align-items:flex-end; padding-top:4px; }
   .er-date{ font-size:13px; color:var(--muted); white-space:nowrap; }
   .er-share{ margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:4px; }
@@ -397,7 +397,7 @@
 
   /* 교육정보 2안 — 기존 썸네일 3열 카드형 */
   .ec-title{ font-size:16.5px; font-weight:800; line-height:1.42; margin-bottom:9px; }
-  .ec-prev{ font-size:13px; color:var(--muted); line-height:1.65; }
+  .ec-prev{ font-size:13px; color:var(--muted); line-height:1.65; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .ec-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:16px; }
   .ec-date{ font-size:12px; color:var(--muted); }
   #s-edu-b .card{ cursor:pointer; display:flex; flex-direction:column; }
@@ -443,7 +443,7 @@
   .mo-card .mthumb{ height:186px; border-radius:14px; margin-bottom:13px; position:relative; }
   .mo-card .edu-tag{ margin-bottom:0; }
   .mo-card h3{ font-size:16px; font-weight:800; line-height:1.42; margin:11px 0 7px; }
-  .mo-card p{ font-size:13.5px; color:var(--muted); line-height:1.6; }
+  .mo-card p{ font-size:13.5px; color:var(--muted); line-height:1.6; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
 
   /* 모바일 상세 */
   .mo-dtags{ display:flex; gap:8px; align-items:center; margin-bottom:12px; }
@@ -1105,7 +1105,7 @@
     <section>
       <div class="wrap">
         <div class="board-head"><h2><span class="new-mark">신규</span>교육정보</h2><p>교육 정책·트렌드부터 학습 공부법, 부모 성장까지</p></div>
-        <div class="plan-note in"><span class="new-mark">신규</span><b>1안 · 가로형 리스트</b>(요청서 PPTX 기준 — 썸네일 좌 · 내용 중앙 · 작성일/공유 우). 노출 요소: 썸네일 · 주제 카테고리 · 제목(55자) · <b>미리보기(공백 포함 최대 150자)</b> · 작성일 · 공유. 탭: 전체 | 교육정책&amp;트렌드 | 학습습관&amp;공부법 | 부모성장. <b>MO·PC 동일</b>, 개별 게시글 <b>URL 슬러그</b>. 참고: 윙크 학습자료실 · 홈런 뉴스룸.</div>
+        <div class="plan-note in"><span class="new-mark">신규</span><b>1안 · 가로형 리스트</b>(요청서 PPTX 기준 — 썸네일 좌 · 내용 중앙 · 작성일/공유 우). 노출 요소: 썸네일 · 주제 카테고리 · 제목(55자) · <b>미리보기(PC 2줄 · 모바일 4줄까지 노출 후 말줄임)</b> · 작성일 · 공유. 탭: 전체 | 교육정책&amp;트렌드 | 학습습관&amp;공부법 | 부모성장. <b>MO·PC 동일</b>, 개별 게시글 <b>URL 슬러그</b>. 참고: 윙크 학습자료실 · 홈런 뉴스룸.</div>
         <div class="filters">
           <div class="chipbar">
             <button class="catchip on">전체</button>
@@ -1162,7 +1162,7 @@
     <section>
       <div class="wrap">
         <div class="board-head"><h2><span class="new-mark">신규</span>교육정보</h2><p>교육 정책·트렌드부터 학습 공부법, 부모 성장까지</p></div>
-        <div class="plan-note in"><span class="new-mark">2안</span><b>2안 · 썸네일 3열 카드형</b>(기존 카드 타입, 3박스). 노출 요소 동일 — 썸네일 · 주제 카테고리 · 제목(55자) · <b>미리보기(공백 포함 최대 150자)</b> · 작성일 · 공유. 1안(리스트형)과 콘텐츠 동일, 배치만 다름.</div>
+        <div class="plan-note in"><span class="new-mark">2안</span><b>2안 · 썸네일 3열 카드형</b>(기존 카드 타입, 3박스). 노출 요소 동일 — 썸네일 · 주제 카테고리 · 제목(55자) · <b>미리보기(PC 2줄까지 노출 후 말줄임)</b> · 작성일 · 공유. 1안(리스트형)과 콘텐츠 동일, 배치만 다름.</div>
         <div class="filters">
           <div class="chipbar">
             <button class="catchip on">전체</button>
