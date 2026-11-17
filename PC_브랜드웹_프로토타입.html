@@ -282,14 +282,28 @@
   @media (max-width:1300px){ #wingBanner, #wingBanner2{ display:none !important; } }
   .wing{ display:none; border-radius:16px; box-shadow:0 12px 30px rgba(0,0,0,.14); padding:18px 16px 14px; text-align:center; }
   .wing.on{ display:block; }
-  .wing.b1{ background:linear-gradient(160deg,#ecedfb,#e2e3f7); }
-  .wing.b2{ background:linear-gradient(160deg,#f6e9fb,#eee0f9); }
-  .wing .eye{ font-size:12.5px; font-weight:800; color:var(--vio); margin-bottom:6px; }
+  .wing.b1{ background:linear-gradient(160deg,#e4effb,#d2e4f8); }
+  .wing.b2{ background:linear-gradient(160deg,#f6e9fb,#eadcf6); }
+  .wing .eye{ font-size:12.5px; font-weight:800; color:#2f4d86; margin-bottom:6px; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:2px; }
   .wing .t{ font-size:16px; font-weight:800; line-height:1.35; color:var(--ink); margin-bottom:12px; letter-spacing:-.5px; }
+  .wing.b1 .t{ color:#2f4d86; }
+  .wing.b2 .t{ color:#4a2a7d; }
   .wing .t small{ display:block; font-size:12.5px; font-weight:600; color:#5b5570; margin-bottom:5px; }
   .wing .thumb{ height:116px; border-radius:10px; margin-bottom:14px; font-size:11.5px; background:#fff; border:1px solid rgba(179,0,242,.15); color:#9a8fb0; }
+  /* 날개 A — 레벨테스트 리포트 썸네일 */
+  .wing .thumb.ltr{ background:#fff; border:1px solid rgba(47,106,217,.2); padding:11px 10px; display:flex; flex-direction:column; justify-content:center; gap:8px; }
+  .ltr-hd{ font-size:9.5px; font-weight:800; letter-spacing:.3px; color:#fff; background:#2f4d86; border-radius:4px; padding:4px 0; }
+  .ltr-lv{ font-size:12.5px; font-weight:700; color:#2f4d86; line-height:1; }
+  .ltr-lv b{ font-size:21px; color:#2f6ad9; }
+  .ltr-bars{ display:flex; flex-direction:column; gap:5px; padding:0 10px; }
+  .ltr-bars i{ height:6px; border-radius:3px; background:linear-gradient(90deg,#4f8bef,#a7cbfb); display:block; }
+  /* 날개 A — 이은경 가이드(책+디바이스) 썸네일 */
+  .wing .thumb.gbk{ position:relative; display:flex; align-items:center; justify-content:center; background:linear-gradient(160deg,#efe6fb,#e0cff7); border-color:rgba(123,79,214,.18); }
+  .gbk-book{ width:60px; height:80px; border-radius:4px 7px 7px 4px; background:linear-gradient(135deg,#7b4fd6,#b36ae8); color:#fff; font-size:10.5px; font-weight:800; line-height:1.3; display:flex; align-items:center; justify-content:center; text-align:center; box-shadow:4px 5px 12px rgba(80,40,140,.3); transform:translateX(-10px) rotate(-5deg); }
+  .gbk-dev{ position:absolute; right:34px; bottom:18px; width:38px; height:52px; border-radius:6px; background:#2b2740; border:3px solid #15131f; box-shadow:0 4px 10px rgba(0,0,0,.25); }
   .wing .wbtn{ display:block; width:100%; background:var(--vio); color:#fff; border:none; border-radius:10px; padding:12px 0; font-size:15px; font-weight:800; cursor:pointer; }
-  .wing.b2 .wbtn{ background:#c23ad6; }
+  .wing.b1 .wbtn{ background:#2f6ad9; }
+  .wing.b2 .wbtn{ background:#e24bb4; }
   .wing-dots{ display:flex; gap:6px; justify-content:center; margin-top:12px; }
   .wing-dots i{ width:7px; height:7px; border-radius:50%; background:#cfc8dc; display:block; }
   .wing-dots i.on{ background:var(--vio); }
@@ -1599,14 +1613,21 @@
     <div class="wing b1 on">
       <div class="eye">✔ 새해 필수 점검</div>
       <div class="t"><small>학군지 학원 그대로</small>영어 레벨테스트<br>&amp;수학 진단 평가</div>
-      <div class="thumb ph">LEVEL TEST REPORT</div>
-      <button class="wbtn" data-s="s-apply">신청하기</button>
+      <div class="thumb ltr">
+        <div class="ltr-hd">LEVEL TEST REPORT</div>
+        <div class="ltr-lv">Lv. <b>6</b></div>
+        <div class="ltr-bars"><i style="width:88%"></i><i style="width:64%"></i><i style="width:92%"></i></div>
+      </div>
+      <button class="wbtn" data-s="s-apply">무료 신청</button>
       <div class="wing-dots"><i class="on"></i><i></i></div>
     </div>
     <div class="wing b2">
       <div class="t"><small>공부 잘~하는 아이로 키우는 방법</small>초등 교사&amp;전문가<br>이은경 선생님의<br>공부 가이드</div>
-      <div class="thumb ph">가이드 표지</div>
-      <button class="wbtn" data-s="s-apply">신청하기</button>
+      <div class="thumb gbk">
+        <div class="gbk-book">이은경<br>가이드</div>
+        <div class="gbk-dev"></div>
+      </div>
+      <button class="wbtn" data-s="s-apply">선착순 무료신청</button>
       <div class="wing-dots"><i></i><i class="on"></i></div>
     </div>
   </div>
