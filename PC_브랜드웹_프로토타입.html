@@ -397,6 +397,18 @@
   .s-ic{ width:30px; height:30px; border-radius:50%; border:none; background:#f1f3f6; color:#8b919c; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex:0 0 auto; }
   .s-ic:hover{ background:#e2e5ea; color:#5b616b; }
   .s-ic svg{ width:15px; height:15px; display:block; }
+  /* 목록 공유 아이콘 — 클릭 시 링크 복사·카카오톡 팝업 */
+  .sic-wrap{ position:relative; display:inline-flex; }
+  .mc-meta .sic-wrap{ margin-left:auto; }
+  .sp2{ position:absolute; top:calc(100% + 7px); right:0; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 10px 26px rgba(0,0,0,.16); padding:5px; display:none; z-index:70; min-width:134px; }
+  .sic-wrap.open .sp2{ display:block; }
+  .sp2::after{ content:""; position:absolute; top:-6px; right:13px; width:11px; height:11px; background:#fff; border-left:1px solid var(--line); border-top:1px solid var(--line); transform:rotate(45deg); }
+  .sp2 button{ display:flex; align-items:center; gap:9px; width:100%; background:none; border:none; border-radius:7px; padding:8px 9px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer; text-align:left; white-space:nowrap; }
+  .sp2 button:hover{ background:var(--vio-bg); }
+  .sp2 .si{ width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .sp2 .si svg{ width:13px; height:13px; display:block; }
+  .sp2 .si.lk{ background:#eef0f4; color:#5b616b; }
+  .sp2 .si.kko{ background:#fae100; color:#391b1b; }
 
   /* ── 교육정보 PC 목록 — 가로형 리스트(썸네일 좌 · 내용 중앙 · 작성일/공유 우) : 요청서(PPTX) ── */
   .edu-list{ margin-top:30px; border-top:1px solid var(--line); }
@@ -407,10 +419,9 @@
   .er-main .edu-tag{ margin-bottom:13px; }
   .er-title{ font-size:20px; font-weight:800; line-height:1.4; margin-bottom:12px; }
   .er-prev{ font-size:14.5px; color:var(--muted); line-height:1.7; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .er-side{ flex:0 0 78px; align-self:stretch; display:flex; flex-direction:column; align-items:flex-end; padding-top:4px; }
+  .er-side{ flex:0 0 auto; display:flex; align-items:center; gap:10px; padding-top:4px; white-space:nowrap; }
   .er-date{ font-size:13px; color:var(--muted); white-space:nowrap; }
-  .er-share{ margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:4px; }
-  .er-sharelbl{ font-size:11px; color:var(--muted); }
+  .er-share{ display:inline-flex; }
 
   /* 모바일 교육정보 카드 메타행(카테고리 · 작성일 · 공유) */
   .mc-meta{ display:flex; align-items:center; gap:10px; margin:0 0 3px; }
@@ -1159,7 +1170,7 @@
               <h3 class="er-title">2027 초등 입학 준비 체크리스트: 입학 전 4개월, 꼭 할 것과 하지 않아도 되는 것</h3>
               <p class="er-prev">초등 입학 4개월 전, 가장 중요한 것은 새로운 학교생활을 스스로 해낼 준비가 되어 있는지 확인하는 것입니다. 규칙적인 생활 리듬, 화장실 이용과 소지품 정리 같은 생활 자립, 한글과 수의 기초적인 경험, 짧게라도 한 가지 활동에 집중하는 습관을 차근차근 준비하면 됩…</p>
             </div>
-            <div class="er-side"><span class="er-date">2026.11.06</span><div class="er-share" onclick="event.stopPropagation()"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><span class="er-sharelbl">공유</span></div></div>
+            <div class="er-side"><span class="er-date">2026.11.06</span><div class="er-share" onclick="event.stopPropagation()"><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div></div>
           </article>
           <article class="edu-row" data-s="s-edu-detail">
             <div class="er-thumb ph"></div>
@@ -1168,7 +1179,7 @@
               <h3 class="er-title">핀란드 교육은 왜 흔들렸을까? — 우리 아이 ‘진짜 자기주도’를 만드는 순서</h3>
               <p class="er-prev">숙제 없는 학교, 시험 없는 교실, 경쟁 없는 교육. 한 번쯤 들어보셨을 거예요. 오랫동안 ‘꿈의 교육’으로 불렸던 핀란드 교육 이야기입니다. 아이를 키우면서 “우리도 핀란드처럼 아이가 스스로 즐겁게 배우게 해주고 싶다”고 생각해 보신 분도 많으실 거예요. 그런데 최…</p>
             </div>
-            <div class="er-side"><span class="er-date">2026.10.21</span><div class="er-share" onclick="event.stopPropagation()"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><span class="er-sharelbl">공유</span></div></div>
+            <div class="er-side"><span class="er-date">2026.10.21</span><div class="er-share" onclick="event.stopPropagation()"><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div></div>
           </article>
           <article class="edu-row" data-s="s-edu-detail">
             <div class="er-thumb ph"><span class="rec-badge"><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z"/></svg>추천</span></div>
@@ -1177,7 +1188,7 @@
               <h3 class="er-title">[수학] 서·논술형 평가 확대? 우리 아이 수학 공부 무엇이 달라져야 할까?</h3>
               <p class="er-prev">서술형·논술형 평가가 확대되면서 ‘정답을 맞히는 힘’보다 ‘풀이 과정을 설명하는 힘’이 중요해졌습니다. 개념을 내 말로 정리하고, 왜 그렇게 풀었는지 과정을 글로 써 보는 연습을 집에서 어떻게 시작하면 좋을지 단계별로 안내합니다. 수학을 어려워하는 아이도 부담 없이 …</p>
             </div>
-            <div class="er-side"><span class="er-date">2026.10.20</span><div class="er-share" onclick="event.stopPropagation()"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><span class="er-sharelbl">공유</span></div></div>
+            <div class="er-side"><span class="er-date">2026.10.20</span><div class="er-share" onclick="event.stopPropagation()"><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div></div>
           </article>
           <article class="edu-row" data-s="s-edu-detail">
             <div class="er-thumb ph"></div>
@@ -1186,7 +1197,7 @@
               <h3 class="er-title">AI 시대, 자녀교육 10년 뒤 직업은 어떻게 달라질까?</h3>
               <p class="er-prev">10년 뒤 사라질 직업과 새로 생길 직업 이야기 속에서, 변화에 흔들리지 않는 아이로 키우려면 지금 무엇을 준비해야 할까요. 기술보다 먼저 길러야 할 ‘배우는 힘’과 스스로 생각하는 힘을 어떻게 키워 줄 수 있는지, 가정에서 실천할 수 있는 구체적인 방법을 함께 이야…</p>
             </div>
-            <div class="er-side"><span class="er-date">2026.10.02</span><div class="er-share" onclick="event.stopPropagation()"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><span class="er-sharelbl">공유</span></div></div>
+            <div class="er-side"><span class="er-date">2026.10.02</span><div class="er-share" onclick="event.stopPropagation()"><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div></div>
           </article>
         </div>
         <div class="pager"><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>›</button></div>
@@ -1570,19 +1581,19 @@
               </div>
               <div class="mo-card">
                 <div class="mthumb ph"><span class="rec-badge"><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z"/></svg>추천</span></div>
-                <div class="mc-meta"><span class="edu-tag t1">교육정책&amp;트렌드</span><span class="mc-date">2026.11.06</span><button class="s-ic" onclick="event.stopPropagation()" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button></div>
+                <div class="mc-meta"><span class="edu-tag t1">교육정책&amp;트렌드</span><span class="mc-date">2026.11.06</span><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div>
                 <h3>2027 초등 입학 준비 체크리스트: 입학 전 4개월, 꼭 할 것과 하지 않아도 되는 것</h3>
                 <p>초등 입학 4개월 전, 가장 중요한 것은 새로운 학교생활을 스스로 해낼 준비가 되어 있는지 확인하는 것입니다. 규칙적인 생활 리듬, 화장실 이용과 소지품 정리 같은 생활 자립, 한글과 수의 기초적인 경험, 짧게라도 한 가지 활동에 집중하는 습관을 차근차근 준비하면 됩…</p>
               </div>
               <div class="mo-card">
                 <div class="mthumb ph"></div>
-                <div class="mc-meta"><span class="edu-tag t2">학습습관&amp;공부법</span><span class="mc-date">2026.10.20</span><button class="s-ic" onclick="event.stopPropagation()" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button></div>
+                <div class="mc-meta"><span class="edu-tag t2">학습습관&amp;공부법</span><span class="mc-date">2026.10.20</span><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div>
                 <h3>[수학] 서·논술형 평가 확대? 우리 아이 수학 공부 무엇이 달라져야 할까?</h3>
                 <p>서술형·논술형 평가가 확대되면서 ‘정답을 맞히는 힘’보다 ‘풀이 과정을 설명하는 힘’이 중요해졌습니다. 개념을 내 말로 정리하고, 왜 그렇게 풀었는지 과정을 글로 써 보는 연습을 집에서 어떻게 시작하면 좋을지 단계별로 안내합니다. 수학을 어려워하는 아이도 부담 없이 …</p>
               </div>
               <div class="mo-card">
                 <div class="mthumb ph"></div>
-                <div class="mc-meta"><span class="edu-tag t2">학습습관&amp;공부법</span><span class="mc-date">2026.10.21</span><button class="s-ic" onclick="event.stopPropagation()" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button></div>
+                <div class="mc-meta"><span class="edu-tag t2">학습습관&amp;공부법</span><span class="mc-date">2026.10.21</span><div class="sic-wrap"><button class="s-ic" title="공유" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 13.4l7.4 4.3M15.7 6.3l-7.4 4.3"/></svg></button><div class="sp2"><button type="button"><span class="si lk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1.2-1.2a3.8 3.8 0 0 1 5.5 5.3l-2 2"/><path d="M13 17.5l-1.2 1.2a3.8 3.8 0 0 1-5.5-5.3l2-2"/></svg></span>링크 복사</button><button type="button"><span class="si kko"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2C6.9 3.2 2.8 6.5 2.8 10.5c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 .1 0 .3.2.3.1.1.2 0 .3 0 .4-.3 2.9-2 3.4-2.4.5.1 1.1.1 1.7.1 5.1 0 9.2-3.3 9.2-7.3S17.1 3.2 12 3.2z"/></svg></span>카카오톡</button></div></div></div>
                 <h3>핀란드 교육은 왜 흔들렸을까? — 우리 아이 ‘진짜 자기주도’를 만드는 순서</h3>
                 <p>숙제 없는 학교, 시험 없는 교실, 경쟁 없는 교육. 한 번쯤 들어보셨을 거예요. 오랫동안 ‘꿈의 교육’으로 불렸던 핀란드 교육 이야기입니다. 아이를 키우면서 “우리도 핀란드처럼 아이가 스스로 즐겁게 배우게 해주고 싶다”고 생각해 보신 분도 많으실 거예요. 그런데 최…</p>
               </div>
@@ -1785,7 +1796,18 @@
   document.querySelectorAll('#s-edu .card').forEach(c=> c.addEventListener('click', ()=> show('s-edu-detail')));
   document.querySelectorAll('#s-notice tbody tr').forEach(r=> r.addEventListener('click', ()=> show('s-notice-detail')));
   document.querySelectorAll('#s-mo-edu .mo-card').forEach(c=> c.addEventListener('click', ()=> show('s-mo-edu-detail')));
-  // 상세 공유 = 링크 복사·카카오톡 2버튼 직접 노출 (프로토, 별도 토글 JS 불필요)
+  // 상세 공유 = 2버튼 직접 노출. 목록 공유 아이콘 = 클릭 시 링크 복사·카카오톡 팝업
+  document.querySelectorAll('.sic-wrap').forEach(w=>{
+    w.addEventListener('click', e=> e.stopPropagation());
+    const ic = w.querySelector('.s-ic');
+    if(ic) ic.addEventListener('click', ()=>{
+      const willOpen = !w.classList.contains('open');
+      document.querySelectorAll('.sic-wrap.open').forEach(o=> o.classList.remove('open'));
+      w.classList.toggle('open', willOpen);
+    });
+    w.querySelectorAll('.sp2 button').forEach(b=> b.addEventListener('click', ()=> w.classList.remove('open')));
+  });
+  document.addEventListener('click', ()=> document.querySelectorAll('.sic-wrap.open').forEach(o=> o.classList.remove('open')));
   // 우측 날개 배너 A — 2종 교차 노출(4초 간격)
   const wings = document.querySelectorAll('#wingBanner .wing');
   if(wings.length > 1){
