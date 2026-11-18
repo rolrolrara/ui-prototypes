@@ -252,24 +252,13 @@
   .btn-submit:hover{ background:var(--vio2); }
 
   /* 하단 무료학습 신청 플로팅 — 배너 2개(각 배너 전체가 버튼) */
-  #floatCta{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); z-index:60; width:calc(100% - 40px); max-width:1120px; display:none; gap:12px; }
-  .fc-banner{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; gap:9px; min-height:58px; padding:8px 16px; border-radius:16px 16px 0 0; text-decoration:none; cursor:pointer; box-shadow:0 -4px 18px rgba(0,0,0,.16); }
-  .fc-banner.blue{ background:#5b93dd; }
-  .fc-banner.yellow{ background:#ffd21e; }
-  .fc-bimg{ position:absolute; bottom:0; height:92px; width:auto; filter:drop-shadow(0 4px 7px rgba(0,0,0,.3)); pointer-events:none; }
-  .fc-bimg.l{ left:4px; }
-  .fc-bimg.r{ right:4px; }
-  .fc-btxt{ display:flex; align-items:center; gap:8px; white-space:nowrap; z-index:1; }
-  .fc-btxt small{ font-size:13px; font-weight:600; opacity:.85; }
-  .fc-btxt b{ font-size:18px; font-weight:800; }
-  .fc-banner.blue .fc-btxt{ color:#0d2550; }
-  .fc-banner.yellow .fc-btxt{ color:#5c4200; }
-  .fc-arrow{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,.55); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; z-index:1; flex-shrink:0; }
-  .fc-banner.blue .fc-arrow{ color:#0d2550; }
-  .fc-banner.yellow .fc-arrow{ color:#5c4200; }
+  #floatCta{ position:fixed; left:50%; bottom:0; transform:translateX(-50%); z-index:60; width:calc(100% - 36px); max-width:1060px; display:none; gap:10px; align-items:flex-end; justify-content:center; pointer-events:none; }
+  #floatCta .fc-l, #floatCta .fc-r{ display:block; pointer-events:auto; cursor:pointer; filter:drop-shadow(0 -3px 14px rgba(0,0,0,.18)); }
+  #floatCta .fc-l{ flex:1140 1 0; }
+  #floatCta .fc-r{ flex:438 1 0; }
+  #floatCta img{ width:100%; height:auto; display:block; }
   body[data-screen="s-eng"] #floatCta, body[data-screen="s-all"] #floatCta{ display:flex; }
   body.hide-floatcta #floatCta{ display:none; }
-  @media (max-width:720px){ .fc-btxt b{ font-size:15px; } .fc-btxt small{ display:none; } .fc-bimg{ height:72px; } }
 
   /* 우측 날개 배너 — A(상품 탭): 교차 노출 / B(게시판 탭): 영상형 */
   #wingBanner, #wingBanner2{ position:fixed; right:16px; top:58%; transform:translateY(-40%); z-index:55; width:186px; display:none; }
@@ -1687,18 +1676,10 @@
     </div>
   </div>
 
-  <!-- 하단 무료학습 신청 플로팅 바 (모바일 플로팅 → PC 하단 바) -->
+  <!-- 하단 무료학습 신청 플로팅 바 (좌: 일반 무료학습 신청 · 우: 간편 무료학습 신청) -->
   <div id="floatCta">
-      <a class="fc-banner blue" data-s="s-apply">
-        <img class="fc-bimg l" src="img/gift-device.webp" alt="캐츠잉글리시 Full-Package">
-        <span class="fc-btxt"><small>카톡이 없다면</small><b>일반 무료학습 신청</b></span>
-        <span class="fc-arrow">›</span>
-      </a>
-      <a class="fc-banner yellow" data-s="s-apply">
-        <span class="fc-btxt"><small>카톡이 있다면</small><b>1초 무료학습 신청</b></span>
-        <span class="fc-arrow">›</span>
-        <img class="fc-bimg r" src="img/gift-book.webp" alt="초등 필수 영단어 교재 세트">
-      </a>
+      <a class="fc-l" data-s="s-apply" aria-label="일반 무료학습 신청"><img src="img/float-left.png" alt="신청자 전원 영단어 세트 선물 · 일반 무료학습 신청"></a>
+      <a class="fc-r" data-s="s-apply" aria-label="간편 무료학습 신청"><img src="img/float-right.png" alt="간편 무료학습 신청"></a>
   </div>
 
   <!-- 푸터 (모든 화면 공통) — catsenglish.net 실제 내용 그대로 -->
