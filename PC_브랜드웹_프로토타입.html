@@ -333,6 +333,8 @@
   .pager button{ border:1px solid var(--line); background:#fff; width:38px; height:38px; border-radius:9px; cursor:pointer; color:#4b5563; }
   .pager button.on{ background:var(--vio); color:#fff; border-color:var(--vio); font-weight:700; }
   .morebtn{ display:block; margin:30px auto 0; border:1.5px solid var(--vio); background:#fff; color:var(--vio); border-radius:999px; padding:12px 34px; font-size:14.5px; font-weight:700; cursor:pointer; }
+  .list-more{ display:none; width:100%; margin:26px auto 2px; }
+  @media (max-width:760px){ .pager{ display:none; } .list-more{ display:block; } }
 
   /* 게시판 상세(공통) — 이용후기·공지·교육정보 */
   #s-review .rev, #s-edu .card, #s-notice tbody tr{ cursor:pointer; }
@@ -1108,6 +1110,7 @@
           <div class="rev" data-s="s-review-detail"><div class="thumb ph"><span class="play">▶</span></div><div class="body"><h3>[인플루언서후기] 워킹맘의 현실 영어 홈스쿨링 한 달 기록</h3></div></div>
         </div>
         <div class="pager"><button class="on">1</button><button>2</button><button>3</button><button>4</button><button title="다음">›</button><button title="맨 뒤">»</button></div>
+        <button class="morebtn list-more">더보기 <b>(1/4)</b> ⌄</button>
         <p class="note" style="text-align:center">※ 제목은 실제 /review 게시물 기준 — 실제 데이터는 /review 연동</p>
       </div>
     </section>
@@ -1205,6 +1208,7 @@
           </article>
         </div>
         <div class="pager"><button class="on">1</button><button>2</button><button>3</button><button title="다음">›</button><button title="맨 뒤">»</button></div>
+        <button class="morebtn list-more">더보기 <b>(1/3)</b> ⌄</button>
         <div class="plan-note in"><span class="new-mark">신규</span><b>페이징</b> — 좌측부터 맨 앞 · 이전 · 숫자(최대 5개) · 다음 · 맨 뒤. 숫자는 5개씩 끊어 현재 페이지가 포함된 구간을 노출. <b>1페이지에선 맨 앞 · 이전 미노출</b>(숫자부터 시작), 마지막 페이지에선 다음 · 맨 뒤 미노출, 1페이지뿐이면 영역 전체 미노출. <b>교육정보 한 페이지 5개</b>.</div>
       </div>
     </section>
